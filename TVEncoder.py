@@ -7,27 +7,69 @@ Created on Fri Jul  5 14:14:22 2013
 
 import sys
 import getopt
+import libfilemanager
+import libsettings
+import libhandbrake
+
+def ShowHelp():
+    print 'TVEncoder.py -p -n <number of files to prepare for processing> - prepare n recordings'
+    print 'TVEncoder.py -p -l -n <number of files to process> - lists the files that will be processed without actually encoding them'
+    print 'TVEncoder.py -e - encode the files that have been processed'
+    print 'TVEncoder.py -e -l - list the files that would be encoded'
+
+def PrintShowsToEncode(showData):
+    print "/n".join(showData)
 
 def main(argv):
     numFiles = 0
-    doEncode = True
+    doEncode = False
+    readOnly = True
+    doList = False
+    
     try:
-       opts, args = getopt.getopt(argv,"hn:l")
+       opts, args = getopt.getopt(argv,"hlpen:")
     except getopt.GetoptError:
-       print 'TVEncoder.py -n <number of files to process> - processes n recordings'
-       print 'TVEncoder.py -l -n <number of files to process> - lists the files that will be processed without actually encoding them'
+       ShowHelp()
        sys.exit(2)
     for opt, arg in opts:
        if opt == '-h':
-          print 'TVEncoder.py -n <number of files to process> - processes n recordings'
-          print 'TVEncoder.py -l -n <number of files to process> - lists the files that will be processed without actually encoding them'
+          ShowHelp()
           sys.exit()
+       elif opt == "-p":
+           doEncode = False
+           readOnly = False
+       elif opt == "-e":
+           readOnly = False
+           doEncode = True
        elif opt == "-n":
           numFiles = arg
-       elif opt == "-l"):
-          doEncode = True
+       elif opt == "-l":
+          readOnly = True
+          doList = True
+    
+    shows = Settings("")
 
-    print "Get to work"
+    if readOnly and doList:
+        if doEncode:
+            #Generate the list of files that would be encoded
+            showData = GetEncodingFiles(shows, readOnly)
+            PrintShowsToEncode(showData)
+        else:
+            # Generate the list of files to process
+    else:
+        if doEncode:
+            #Encode the files and move them to their final destination
+            showData = GetEncodingFiles(shows, readOnly)
+            
+            for show in showData:
+                if CheckFileExists(show.outputFile):
+                    print "File {0} already exists. Cannot process.".format(show.outputFile)
+                else:
+                    result = Encoder.Encode(show.inputFile, show.outputFile)
+                    
+                    PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
+        else:
+            #Process files for encoding
 
 if __name__ == "__main__":
     main(sys.argv[1:])
