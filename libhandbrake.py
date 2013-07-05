@@ -33,3 +33,4 @@ class Encoder:
             return process.returncode
             
         return None
+    
