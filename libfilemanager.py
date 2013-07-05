@@ -5,6 +5,8 @@ Created on Fri Jul  5 14:11:31 2013
 @author: shanef
 """
 
+import glob
+import libtvdatasource as TVData
 import os
 import shutil
 
@@ -16,8 +18,8 @@ class EncodeData:
     show = None
     outputFile = ''
     
-    def ToString():
-        return "Input: {0}/tOutput: {2}".format(inputFile, outputFile)
+    def ToString(self):
+        return "Input: {0}/tOutput: {2}".format(self.inputFile, self.outputFile)
 
 def __GetInputFilesToEncode(shows):
     fileList = []
@@ -72,3 +74,23 @@ def PerformPostEncodeFileOperations(inputFileName, outputFileName):
     os.remove(linkAddress)
 
     os.symlink(outputFileName, linkAddress)
+
+def GetFilesToPrepare(path, numberofFiles, shows):
+    files = glob.glob("{0}*.mpg".format(path))
+    files = sorted(files, key=os.path.getctime)
+    files = filter(lambda file: not os.path.islink(file), files)
+    
+    #files is now a list of unprocessed files, but contains shows other than those we are interested in
+    
+    filesToProcess = []
+    i = 0
+    for file in files:
+        # TODO get these from settings
+        if TVData.CheckTitleIsInList('localhost', 'script', 'script', 'mythconverg', file):
+            filesToProcess.append(file)
+            i = i + 1
+            if i == numberofFiles:
+                return filesToProcess
+    
+    return filesToProcess #will reach here if there were less than numberofFiles found
+    

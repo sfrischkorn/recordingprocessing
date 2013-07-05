@@ -11,6 +11,8 @@ import libfilemanager
 import libsettings
 import libhandbrake
 
+TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
+
 def ShowHelp():
     print 'TVEncoder.py -p -n <number of files to prepare for processing> - prepare n recordings'
     print 'TVEncoder.py -p -l -n <number of files to process> - lists the files that will be processed without actually encoding them'
@@ -47,7 +49,7 @@ def main(argv):
           readOnly = True
           doList = True
     
-    shows = Settings("")
+    shows = Settings("") # TODO call actual settings file
 
     if readOnly and doList:
         if doEncode:
@@ -56,6 +58,7 @@ def main(argv):
             PrintShowsToEncode(showData)
         else:
             # Generate the list of files to process
+            files = GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
     else:
         if doEncode:
             #Encode the files and move them to their final destination
@@ -69,7 +72,7 @@ def main(argv):
                     
                     PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
         else:
-            #Process files for encoding
+            # TODO Process files for encoding
 
 if __name__ == "__main__":
     main(sys.argv[1:])
