@@ -63,7 +63,7 @@ def main(argv):
         else:
             # Generate the list of files to process
             shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, showSettings)
-            print len(shows)
+            print "num results: {0}".format(len(shows))
             PrintShowsToPrepare(shows)
     else:
         if doEncode:
