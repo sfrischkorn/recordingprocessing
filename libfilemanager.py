@@ -93,7 +93,7 @@ def GetFilesToPrepare(path, numberofFiles, shows):
         if showData:
             showsToProcess.append(showData)
             i = i + 1
-            if i == numberofFiles:
+            if i == int(numberofFiles):
                 return showsToProcess
     
     return showsToProcess #will reach here if there were less than numberofFiles found

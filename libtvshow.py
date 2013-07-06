@@ -14,3 +14,6 @@ class TVShow:
         self.description = description
         self.inputFile = inputFile
         self.outputFile = outputFile
+    
+    def Print(self):
+        print "Input: {0} -> Output: {1}".format(self.inputFile, self.outputFile)

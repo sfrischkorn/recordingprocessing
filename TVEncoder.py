@@ -12,8 +12,8 @@ from libsettings import Settings
 from libhandbrake import Encoder
 import libtvdatasource
 
-#TVRECORDINGSDIR = "/Volumes/TV Recordings/"
-TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
+TVRECORDINGSDIR = "/Volumes/TV Recordings/"
+#TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
 
 def ShowHelp():
     print 'TVEncoder.py -p -n <number of files to prepare for processing> - prepare n recordings'
@@ -24,8 +24,9 @@ def ShowHelp():
 def PrintShowsToEncode(showData):
     print "/n".join(showData)
 
-def PrintShowsToPrepare(showData):
-    print "/n".join(showData)
+def PrintShowsToPrepare(showsData):
+    for showData in showsData:
+        showData.Print()
 
 def main(argv):
     numFiles = 0
@@ -63,7 +64,11 @@ def main(argv):
             PrintShowsToEncode(showData)
         else:
             # Generate the list of files to process
-            shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, showSettings)
+            tempShowList = ["Thomas and Friends", "Thomas the Tank Engine & Friends", 
+                            "Chuggington", "Mike the Knight", "Octonauts", 
+                            "The Octonauts", "In the Night Garden", 
+                            "Raa Raa! The Noisy Lion"] # TODO get from settings
+            shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, tempShowList)
             print "num results: {0}".format(len(shows))
             PrintShowsToPrepare(shows)
     else:
