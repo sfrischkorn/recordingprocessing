@@ -21,6 +21,7 @@ class EncodeData:
     def ToString(self):
         return "Input: {0}/tOutput: {2}".format(self.inputFile, self.outputFile)
 
+
 def __GetInputFilesToEncode(shows):
     fileList = []
     
@@ -82,15 +83,17 @@ def GetFilesToPrepare(path, numberofFiles, shows):
     
     #files is now a list of unprocessed files, but contains shows other than those we are interested in
     
-    filesToProcess = []
+    showsToProcess = []
     i = 0
     for file in files:
         # TODO get these from settings
-        if TVData.CheckTitleIsInList('localhost', 'script', 'script', 'mythconverg', file):
-            filesToProcess.append(file)
+        #if TVData.CheckTitleIsInList('localhost', 'script', 'script', 'mythconverg', file):
+        showData = TVData.RetrieveEpisodeData('localhost', 'script', 'script', 'mythconverg', file, shows)
+        if showData:
+            showsToProcess.append(showData)
             i = i + 1
             if i == numberofFiles:
-                return filesToProcess
+                return showsToProcess
     
-    return filesToProcess #will reach here if there were less than numberofFiles found
+    return showsToProcess #will reach here if there were less than numberofFiles found
     

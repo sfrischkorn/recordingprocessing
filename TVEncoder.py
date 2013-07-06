@@ -8,8 +8,9 @@ Created on Fri Jul  5 14:14:22 2013
 import sys
 import getopt
 import libfilemanager
-import libsettings
+from libsettings import Settings
 import libhandbrake
+import libtvdatasource
 
 TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
 
@@ -20,6 +21,9 @@ def ShowHelp():
     print 'TVEncoder.py -e -l - list the files that would be encoded'
 
 def PrintShowsToEncode(showData):
+    print "/n".join(showData)
+
+def PrintShowsToPrepare(showData):
     print "/n".join(showData)
 
 def main(argv):
@@ -58,7 +62,8 @@ def main(argv):
             PrintShowsToEncode(showData)
         else:
             # Generate the list of files to process
-            files = GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
+            shows = GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
+            PrintShowsToPrepare(shows)
     else:
         if doEncode:
             #Encode the files and move them to their final destination
@@ -73,6 +78,8 @@ def main(argv):
                     PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
         else:
             # TODO Process files for encoding
+            shows = GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
+            PrepareEpisodes(shows)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
