@@ -9,7 +9,7 @@ import sys
 import getopt
 import libfilemanager
 from libsettings import Settings
-import libhandbrake
+from libhandbrake import Encoder
 import libtvdatasource
 
 TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
@@ -58,28 +58,28 @@ def main(argv):
     if readOnly and doList:
         if doEncode:
             #Generate the list of files that would be encoded
-            showData = GetEncodingFiles(shows, readOnly)
+            showData = libfilemanager.GetEncodingFiles(shows, readOnly)
             PrintShowsToEncode(showData)
         else:
             # Generate the list of files to process
-            shows = GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
+            shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
             PrintShowsToPrepare(shows)
     else:
         if doEncode:
             #Encode the files and move them to their final destination
-            showData = GetEncodingFiles(shows, readOnly)
+            showData = libfilemanager.GetEncodingFiles(shows, readOnly)
             
             for show in showData:
-                if CheckFileExists(show.outputFile):
+                if libfilemanager.CheckFileExists(show.outputFile):
                     print "File {0} already exists. Cannot process.".format(show.outputFile)
                 else:
                     result = Encoder.Encode(show.inputFile, show.outputFile)
                     
-                    PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
+                    libfilemanager.PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
         else:
             # TODO Process files for encoding
-            shows = GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
-            PrepareEpisodes(shows)
+            shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
+            libtvdatasource.PrepareEpisodes(shows)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

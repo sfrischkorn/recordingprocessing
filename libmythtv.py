@@ -6,7 +6,7 @@ Created on Fri Jul  5 14:10:47 2013
 """
 
 import MySQLdb as mdb
-from libtvdatasource import TVShow
+from libtvshow import TVShow
 
 class MythTV:
     def RetrieveEpisodeData(serverAddress, user, password, database, inputFile):

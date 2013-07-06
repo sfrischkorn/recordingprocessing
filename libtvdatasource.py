@@ -9,6 +9,7 @@ import libmythtv as MythTV
 from libsickbeard import Sickbeard
 import os
 import shutil
+from libtvshow import TVShow
 
 # TODO Move these to settings
 PROCESSDIR="/srv/storage2/files/VideoProcessing/"
@@ -19,16 +20,6 @@ OCTONAUTS="Octonauts"
 NIGHTGARDEN="InTheNightGarden"
 RAARAA="RaaRaa"
 INPUTDIR="Input"
-
-class TVShow:
-    def __init__(self, episode, season, title, subtitle, description, inputFile='', outputFile=''):
-        self.episode = episode
-        self.season = season
-        self.title = title
-        self.subtitle = subtitle
-        self.description = description
-        self.inputFile = inputFile
-        self.outputFile = outputFile
 
 def FixEpisodeSeasonNumber(number):
     if number < 10:
