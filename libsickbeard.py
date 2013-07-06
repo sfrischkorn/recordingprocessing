@@ -24,6 +24,12 @@ class Sickbeard:
         jsonurl = urlopen(self.__GetApiURL()+"?cmd=shows")
         result = json.loads(jsonurl.read())
 
+        # TODO find a better way to do this
+        if showName == "Thomas and Friends":
+            showName = "Thomas The Tank Engine & Friends"
+        elif showName == "The Octonauts":
+            showName = "Octonauts"
+
         shows = []
         for show in result['data']:
             shows.append((show, fuzz.partial_ratio(showName.lower(), result['data'][show]['show_name'].lower())))
@@ -38,7 +44,7 @@ class Sickbeard:
         episodeResult = json.loads(jsonEpisodeUrl.read())
     
         if fuzz.ratio(episodeResult['data']['description'].lower(), description.lower()) > 85:
-            return (season, episode)
+            return (season, episode, episodeResult['data']['name'])
         
         return None
 
@@ -49,13 +55,13 @@ class Sickbeard:
         for season in result['data']:
             for episode in result['data'][season]:
                 if name is not None and name.lower() == result['data'][season][episode]['name'].lower():
-                    return (season, episode)
+                    return (season, episode, name)
                 elif description is not None:
-                    result = self.FindEpisodeByDescription(showId, season, episode, description)
-                    if result is not None:
-                        return result
+                    descriptionQueryResult = self.FindEpisodeByDescription(showId, season, episode, description)
+                    if descriptionQueryResult is not None:
+                        return descriptionQueryResult
         
-        return (0, 0)
+        return (0, 0, '')
         
     def GetEpisodeName(subtitle, showName):
         if subtitle[:len(showName)].lower() == showName.lower():

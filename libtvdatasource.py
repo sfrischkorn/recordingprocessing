@@ -21,10 +21,10 @@ RAARAA="RaaRaa"
 INPUTDIR="Input"
 
 def FixEpisodeSeasonNumber(number):
-    if number < 10:
+    if len(number) == 1:
         return "0{0}".format(number)
     else:
-        return str(number)
+        return number
 
 def GetDirectory(title, season):
     directory = ""
@@ -47,35 +47,34 @@ def GetDirectory(title, season):
         
 def RetrieveEpisodeData(serverAddress, user, password, database, inputFile, showsToProcess, sickbeardAddress, sickbeardPort, sickbeardAPIKey):
     file = os.path.basename(inputFile)
-    #print file
     show = MythTV.RetrieveEpisodeData(serverAddress, user, password, database, file)
-    #print "file: {0}  mythtv returned show name {1}".format(file, show.title)
     
     if show.title and show.title in showsToProcess:
         if show.subtitle:
             show.subtitle = GetEpisodeName(show.subtitle, show.title)
 
-        if (show.season == '0' or show.episode == '0'):
+        if (show.season == "0" or show.episode == "0"):
             sickbeard = Sickbeard(sickbeardAddress, sickbeardPort, sickbeardAPIKey)
             showId = sickbeard.FindShowId(show.title)
             
             result = sickbeard.FindEpisode(showId, show.subtitle, show.description)
-            show.season = result[0]
-            show.episode = result[1]
+            show.season = str(result[0])
+            show.episode = str(result[1])
+            show.subtitle = result[2]
             
         if show.season != "0" and show.episode != "0":
             show.season = FixEpisodeSeasonNumber(show.season)
             show.episode = FixEpisodeSeasonNumber(show.episode)
             
-            seasonFolder = "Season {0}".format(show.season)
-            season = "S{0}".format(show.season)
-            episode = "E{0}".format(show.episode)
-            renamedFile = "{0}{1} - {2} - SD TV_.mpg".format(season, episode, show.subtitle)
+        seasonFolder = "Season {0}".format(show.season)
+        season = "S{0}".format(show.season)
+        episode = "E{0}".format(show.episode)
+        renamedFile = "{0}{1} - {2} - SD TV_.mpg".format(season, episode, show.subtitle)
             
-            directory = GetDirectory(show.title, seasonFolder)
+        directory = GetDirectory(show.title, seasonFolder)
             
-            show.outputFile = os.path.join(directory, inputFile[:-4], renamedFile)
-            show.inputFile = inputFile
+        show.outputFile = os.path.join(directory, file[:-4], renamedFile)
+        show.inputFile = inputFile
     
         return show
     else:
