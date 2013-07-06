@@ -88,7 +88,7 @@ def GetFilesToPrepare(path, numberofFiles, shows):
     for file in files:
         # TODO get these from settings
         #if TVData.CheckTitleIsInList('localhost', 'script', 'script', 'mythconverg', file):
-        showData = TVData.RetrieveEpisodeData('localhost', 'script', 'script', 'mythconverg', file, shows)
+        showData = TVData.RetrieveEpisodeData('192.168.0.2', 'script', 'script', 'mythconverg', file, shows, '192.168.0.2', '8081', '3678177136222bf5002be209220ccb20') # TODO all these settings need to move to settings
         if showData:
             showsToProcess.append(showData)
             i = i + 1

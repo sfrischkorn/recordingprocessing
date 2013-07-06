@@ -9,7 +9,6 @@ import libmythtv as MythTV
 from libsickbeard import Sickbeard
 import os
 import shutil
-from libtvshow import TVShow
 
 # TODO Move these to settings
 PROCESSDIR="/srv/storage2/files/VideoProcessing/"
@@ -46,18 +45,19 @@ def GetDirectory(title, season):
     
     return os.path.join(PROCESSDIR, directory, INPUTDIR, season)
         
-def RetrieveEpisodeData(serverAddress, user, password, database, inputFile, showsToProcess):
+def RetrieveEpisodeData(serverAddress, user, password, database, inputFile, showsToProcess, sickbeardAddress, sickbeardPort, sickbeardAPIKey):
     file = os.path.basename(inputFile)
-    show = MythTV.RetrieveEpisodeData('localhost', 'script', 'script', 'mythconverg', file)
+    show = MythTV.RetrieveEpisodeData(serverAddress, user, password, database, file)
     
     if show.title and show.title in showsToProcess:
         if show.subtitle:
             show.subtitle = GetEpisodeName(show.subtitle, show.title)
 
         if (show.season == '0' or show.episode == '0'):
-            showId = Sickbeard.FindShowId(show.title)
+            sickbeard = Sickbeard(sickbeardAddress, sickbeardPort, sickbeardAPIKey)
+            showId = sickbeard.FindShowId(show.title)
             
-            result = Sickbeard.FindEpisode(showId, show.subtitle, show.description)
+            result = sickbeard.FindEpisode(showId, show.subtitle, show.description)
             show.season = result[0]
             show.episode = result[1]
             
