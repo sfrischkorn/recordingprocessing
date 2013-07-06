@@ -47,6 +47,7 @@ def GetDirectory(title, season):
         
 def RetrieveEpisodeData(serverAddress, user, password, database, inputFile, showsToProcess, sickbeardAddress, sickbeardPort, sickbeardAPIKey):
     file = os.path.basename(inputFile)
+    print file
     show = MythTV.RetrieveEpisodeData(serverAddress, user, password, database, file)
     print "file: {0}  mythtv returned show name {1}".format(file, show.title)
     
