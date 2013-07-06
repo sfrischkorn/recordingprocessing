@@ -15,6 +15,7 @@ def RetrieveEpisodeData(serverAddress, user, password, database, inputFile):
         cur = con.cursor(mdb.cursors.DictCursor)
         cur.execute("select episode, season, title, subtitle, description from mythconverg.recorded where basename = '{0}'".format(inputFile))
         result = cur.fetchone()
+        print result
             
         return TVShow(result['episode'], result['season'], result['title'], result['subtitle'], result['description'])
       
