@@ -85,6 +85,7 @@ def GetFilesToPrepare(path, numberofFiles, shows):
     
     showsToProcess = []
     i = 0
+    print "Found {0} potential files".format(len(files))
     for file in files:
         # TODO get these from settings
         #if TVData.CheckTitleIsInList('localhost', 'script', 'script', 'mythconverg', file):
