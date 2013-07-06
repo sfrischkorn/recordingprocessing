@@ -12,7 +12,8 @@ from libsettings import Settings
 from libhandbrake import Encoder
 import libtvdatasource
 
-TVRECORDINGSDIR = "/Volumes/TV Recordings/"#"/srv/storage2/videos/TVRecordings/" # TODO move this to settings
+#TVRECORDINGSDIR = "/Volumes/TV Recordings/"
+TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
 
 def ShowHelp():
     print 'TVEncoder.py -p -n <number of files to prepare for processing> - prepare n recordings'
