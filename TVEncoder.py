@@ -7,12 +7,12 @@ Created on Fri Jul  5 14:14:22 2013
 
 import sys
 import getopt
-import libfilemanager
+from libfilemanager import FileManager
 from libsettings import Settings
 from libhandbrake import Encoder
 import libtvdatasource
 
-TVRECORDINGSDIR = "/Volumes/TV Recordings/"
+#TVRECORDINGSDIR = "/Volumes/TV Recordings/"
 #TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
 
 def ShowHelp():
@@ -55,37 +55,42 @@ def main(argv):
           readOnly = True
           doList = True
     
-    showSettings = Settings("settings.xml") # TODO call actual settings file
+    settings = Settings("settings.cfg")
 
     if readOnly and doList:
         if doEncode:
             #Generate the list of files that would be encoded
-            showData = libfilemanager.GetEncodingFiles(showSettings, readOnly)
+            fileManager = FileManager(settings)
+            showData = fileManager.GetEncodingFiles(readOnly)
             PrintShowsToEncode(showData)
         else:
             # Generate the list of files to process
-            tempShowList = ["Thomas and Friends", "Thomas the Tank Engine & Friends", 
-                            "Chuggington", "Mike the Knight", "Octonauts", 
-                            "The Octonauts", "In the Night Garden", 
-                            "Raa Raa! The Noisy Lion"] # TODO get from settings
-            shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, tempShowList)
+#            tempShowList = ["Thomas and Friends", "Thomas the Tank Engine & Friends", 
+#                            "Chuggington", "Mike the Knight", "Octonauts", 
+#                            "The Octonauts", "In the Night Garden", 
+#                            "Raa Raa! The Noisy Lion"] # TODO get from settings
+            fileManager = FileManager(settings)
+            shows = fileManager.GetFilesToPrepare(numFiles)
             print "num results: {0}".format(len(shows))
             PrintShowsToPrepare(shows)
     else:
         if doEncode:
             #Encode the files and move them to their final destination
-            showData = libfilemanager.GetEncodingFiles(shows, readOnly)
+            fileManager = FileManager(settings)
+            showData = fileManager.GetEncodingFiles(readOnly)
             
             for show in showData:
-                if libfilemanager.CheckFileExists(show.outputFile):
+                if fileManager.CheckFileExists(show.outputFile):
                     print "File {0} already exists. Cannot process.".format(show.outputFile)
                 else:
-                    result = Encoder.Encode(show.inputFile, show.outputFile)
+                    encoder = Encoder(settings.HandbrakeCommand)
+                    result = encoder.Encode(show.inputFile, show.outputFile)
                     
-                    libfilemanager.PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
+                    fileManager.PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
         else:
             # TODO Process files for encoding
-            shows = libfilemanager.GetFilesToPrepare(TVRECORDINGSDIR, numFiles, shows)
+            fileManager = FileManager(settings)        
+            shows = fileManager.GetFilesToPrepare(numFiles)
             libtvdatasource.PrepareEpisodes(shows)
 
 if __name__ == "__main__":
