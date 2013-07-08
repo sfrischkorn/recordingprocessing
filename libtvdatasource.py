@@ -125,12 +125,12 @@ class TVData:
         return os.path.join(dir, filename)
         
     
-    def ProcessEpisode(inputFile, outputFile):  
+    def ProcessEpisode(self, inputFile, outputFile):  
         outputdir = os.path.dirname(outputFile)
         if not os.path.exists(outputdir):
             os.makedirs(outputdir)
             
-        shutil.move(inputFile, outputFile)
+        shutil.copyfile(inputFile, outputFile)
     
     def PrepareEpisodes(self, showsData):
         for showData in showsData:
