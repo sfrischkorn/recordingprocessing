@@ -30,13 +30,15 @@ class TVData:
         else:
             return number
     
-    def GetDirectory(self, title, season):        
+    def GetDirectory(self, title, seasonFolder, season, episode):        
         show = self.settings.GetShow(title)
         if not show or show == "":
             print "Couldn't find show for {0}".format(title)
             return self.settings.UnknownDirectory()
+        elif season == "S00" or episode == "E00":
+            return self.settings.GetShowUnknownDirectory(show)
         else:
-            return os.path.join(self.settings.GetShowInputDirectory(show), season)
+            return os.path.join(self.settings.GetShowInputDirectory(show), seasonFolder)
 #==============================================================================
 #         if title == "Thomas and Friends" or title == "Thomas the Tank Engine & Friends":
 #             directory = THOMAS
@@ -80,17 +82,17 @@ class TVData:
                 show.episode = str(result[1])
                 show.subtitle = result[2]
                 
-            if show.season != "0" and show.episode != "0":
+            #if show.season != "0" and show.episode != "0":
                 show.season = self.FixEpisodeSeasonNumber(show.season)
                 show.episode = self.FixEpisodeSeasonNumber(show.episode)
-                
+            
             seasonFolder = "Season {0}".format(show.season)
             season = "S{0}".format(show.season)
             episode = "E{0}".format(show.episode)
             renamedFile = "{0}{1} - {2} - SD TV_.mpg".format(season, episode, show.subtitle)
                 
-            directory = self.GetDirectory(show.title, seasonFolder)
-                
+            directory = self.GetDirectory(show.title, seasonFolder, season, episode)
+            
             show.outputFile = os.path.join(directory, file[:-4], renamedFile)
             show.inputFile = inputFile
         

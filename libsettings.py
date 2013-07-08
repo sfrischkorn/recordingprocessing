@@ -63,6 +63,13 @@ class Settings:
             return ""
         else:
             return show["InputDirectory"]
+
+    def GetShowUnknownDirectory(self, showName):
+        show = self.__GetShowSubsection(showName)
+        if show is None:
+            return ""
+        else:
+            return show["UnknownDirectory"]
     
     def GetShowOutputDirectory(self, showName):
         show = self.__GetShowSubsection(showName)
