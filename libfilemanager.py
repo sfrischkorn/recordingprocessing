@@ -19,7 +19,7 @@ class EncodeData:
     outputFile = ''
     
     def ToString(self):
-        return "Input: {0}/tOutput: {2}".format(self.inputFile, self.outputFile)
+        return "Show: {0}\nInput: {1}\nOutput: {2}\n".format(self.show, self.inputFile, self.outputFile)
 
 class FileManager:
     def __init__(self, settings):
@@ -29,7 +29,7 @@ class FileManager:
         fileList = []
         
         for show in self.settings.GetShowNames():
-            for r,d,f in os.walk(show.GetShowInputDirectory(show)):
+            for r,d,f in os.walk(self.settings.GetShowInputDirectory(show)):
                 for files in f:
                     if files.endswith(".mpg"):
                         data = EncodeData()
@@ -52,13 +52,13 @@ class FileManager:
     def __GetEncodeOutputFile(self, inputFile, showName, readOnly):
         inFile = os.path.basename(inputFile)
         outFilename = inFile[:-3]+"mkv"
-        outPath = self.__FindSeason(self.settings.GetShowOutputFile(showName), outFilename)
+        outPath = self.__FindSeason(self.settings.GetShowOutputDirectory(showName), outFilename, readOnly)
         return os.path.join(outPath, outFilename)
     
     def GetEncodingFiles(self, readOnly=True):
-        showsData = self.__GetInputFilesToEncode(self.settings.GetShowNames())
+        showsData = self.__GetInputFilesToEncode()
         for showData in showsData:
-            showData.outputFile = self.__GetEncodeOutputFile(showData.inputFile, showData.name, readOnly)
+            showData.outputFile = self.__GetEncodeOutputFile(showData.inputFile, showData.show, readOnly)
         
         return showsData
     

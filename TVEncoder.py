@@ -21,8 +21,10 @@ def ShowHelp():
     print 'TVEncoder.py -e - encode the files that have been processed'
     print 'TVEncoder.py -e -l - list the files that would be encoded'
 
-def PrintShowsToEncode(showData):
-    print "/n".join(showData)
+def PrintShowsToEncode(showsData):
+#    print "/n".join(showData)
+    for showData in showsData:
+        print showData.ToString()
 
 def PrintShowsToPrepare(showsData):
     for showData in showsData:
