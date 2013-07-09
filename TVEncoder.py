@@ -10,7 +10,7 @@ import getopt
 from libfilemanager import FileManager
 from libsettings import Settings
 from libhandbrake import Encoder
-import libtvdatasource
+from libtvdatasource import TVData
 
 #TVRECORDINGSDIR = "/Volumes/TV Recordings/"
 #TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/" # TODO move this to settings
@@ -91,7 +91,8 @@ def main(argv):
             # TODO Process files for encoding
             fileManager = FileManager(settings)        
             shows = fileManager.GetFilesToPrepare(numFiles)
-            libtvdatasource.PrepareEpisodes(shows)
+            tvData = TVData(settings)
+            tvData.PrepareEpisodes(shows)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
