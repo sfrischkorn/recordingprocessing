@@ -81,10 +81,13 @@ class TVData:
                 show.season = str(result[0])
                 show.episode = str(result[1])
                 show.subtitle = result[2]
+            
+            if show.subtitle is None or show.subtitle == "":
+                show.subtitle = sickbeard.FindEpisodeName(showId, show.season, show.episode)
                 
             #if show.season != "0" and show.episode != "0":
-                show.season = self.FixEpisodeSeasonNumber(show.season)
-                show.episode = self.FixEpisodeSeasonNumber(show.episode)
+            show.season = self.FixEpisodeSeasonNumber(show.season)
+            show.episode = self.FixEpisodeSeasonNumber(show.episode)
             
             seasonFolder = "Season {0}".format(show.season)
             season = "S{0}".format(show.season)

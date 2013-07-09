@@ -49,6 +49,14 @@ class Sickbeard:
             return (season, episode, episodeResult['data']['name'])
 
         return None
+    
+    def FindEpisodeName(self, showId, season, episode):
+        jsonurl = urlopen("{0}?cmd=episode&tvdbid={1}&season={2}&episode={3}".format(self.__GetApiURL(), showId, int(season), int(episode)))
+        result = json.loads(jsonurl.read())
+        if result['result'] == 'error':
+            return ""
+        else:
+            return result['data']['name']
 
     def FindEpisode(self, showId, name=None, description=None):
         jsonurl = urlopen("{0}?cmd=show.seasons&tvdbid={1}".format(self.__GetApiURL(), showId))
