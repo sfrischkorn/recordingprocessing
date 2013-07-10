@@ -10,96 +10,149 @@ from libtvdatasource import TVData
 import os
 import shutil
 
-#move this to settings
-#TVRECORDINGSDIR = "/srv/storage2/videos/TVRecordings/"
 
 class EncodeData:
-    inputFile = ''
-    show = None
-    outputFile = ''
-    
-    def ToString(self):
-        return "Show: {0}\nInput: {1}\nOutput: {2}\n".format(self.show, self.inputFile, self.outputFile)
+    """
+    Contains detais of files to encode.
+    inputfile - The source file
+    outputfile - The destination file
+    show - The name of the show
+    """
+
+    def __init__(self, inputfile='', show=None, outputfile=''):
+        self.inputfile = inputfile
+        self.show = show
+        self.outputfile = outputfile
+
+    def __str__(self):
+        return "Show: {0}\nInput: {1}\nOutput: " \
+               "{2}\n".format(self.show, self.inputfile, self.outputfile)
+
 
 class FileManager:
+    """
+    Perform file operations
+    """
+
     def __init__(self, settings):
         self.settings = settings
-        
-    def __GetInputFilesToEncode(self):
-        fileList = []
-        
-        for show in self.settings.GetShowNames():
-            for r,d,f in os.walk(self.settings.GetShowInputDirectory(show)):
-                for files in f:
-                    if files.endswith(".mpg"):
-                        data = EncodeData()
-                        data.show = show
-                        data.inputFile = os.path.join(r,files)
-                        fileList.append(data)
-        
-        return fileList
-    
-    def __FindSeason(self, path, fileName, readOnly):
-        season = "Season {0}".format(fileName[1:3])
-        seasonPath = os.path.join(path, season)
-    
-        if not readOnly:    
-            if not os.path.exists(seasonPath):
-                os.makedirs(seasonPath)
-        
-        return seasonPath
-    
-    def __GetEncodeOutputFile(self, inputFile, showName, readOnly):
-        inFile = os.path.basename(inputFile)
-        outFilename = inFile[:-3]+"mkv"
-        outPath = self.__FindSeason(self.settings.GetShowOutputDirectory(showName), outFilename, readOnly)
-        return os.path.join(outPath, outFilename)
-    
-    def GetEncodingFiles(self, readOnly=True):
-        showsData = self.__GetInputFilesToEncode()
-        for showData in showsData:
-            showData.outputFile = self.__GetEncodeOutputFile(showData.inputFile, showData.show, readOnly)
-        
-        return showsData
-    
-    def CheckFileExists(self, file):
-        return os.path.isfile(file)
-        
-    def __GetRecordingFile(self, fileName):
-        return os.path.join(self.settings.TVRecordingDirectory(), os.path.dirname(fileName).split("/")[-1] + ".mpg")
-        
-    def PerformPostEncodeFileOperations(self, inputFileName, outputFileName):
-        shutil.rmtree(os.path.dirname(inputFileName))
-    
-        linkAddress = self.__GetRecordingFile(inputFileName)
-    
-        os.remove(linkAddress)
-    
-        os.symlink(outputFileName, linkAddress)
-    
-    def GetFilesToPrepare(self, numberofFiles):
-        path = self.settings.TVRecordingDirectory()
-        files = glob.glob("{0}*.mpg".format(path))
-        files = sorted(files, key=os.path.getctime)
-        files = filter(lambda file: not os.path.islink(file), files)
-        
-        #files is now a list of unprocessed files, but contains shows other than those we are interested in  
-        
-        showsToProcess = []
-        i = 0
-        print "Found {0} potential files".format(len(files))
 
-        tvData = TVData(self.settings)        
-        
-        for file in files:
-            # TODO get these from settings
-            #if TVData.CheckTitleIsInList('localhost', 'script', 'script', 'mythconverg', file):
-            showData = tvData.RetrieveEpisodeData(file)
-            if showData:
-                showsToProcess.append(showData)
+    def getencodingfiles(self, readonly=True):
+        """
+        Get the details of the shows that are ready for encoding
+        """
+
+        showsdata = self.__getinputfilestoencode()
+        for showdata in showsdata:
+            showdata.outputfile = self.__getencodeoutputfile(
+                showdata.inputfile, showdata.show, readonly)
+
+        return showsdata
+
+    def performpostencodefileoperations(self, inputfilename, outputfilename):
+        """
+        Delete the input file, and the original recorded file. Then create a
+        symlink from the new encoded file to the original mythtv file.
+        """
+
+        shutil.rmtree(os.path.dirname(inputfilename))
+
+        linkaddress = self.__getrecordingfile(inputfilename)
+
+        os.remove(linkaddress)
+
+        os.symlink(outputfilename, linkaddress)
+
+    def getfilestoprepare(self, numberoffiles):
+        """
+        Get the details of the first <numberoffiles> to prepare for encoding.
+        If there are less files than <numberoffiles> available, it will
+        return the details of the number available.
+        """
+
+        path = self.settings.TVRecordingDirectory()
+        potentialfiles = glob.glob("{0}*.mpg".format(path))
+        potentialfiles = sorted(potentialfiles, key=os.path.getctime)
+        potentialfiles = [potentialfile for potentialfile in potentialfiles
+                          if not os.path.islink(potentialfile)]
+
+        #files is now a list of unprocessed files, but contains shows other
+        #than those we are interested in
+        showstoprocess = []
+        i = 0
+        print "Found {0} potential files".format(len(potentialfiles))
+
+        tvdata = TVData(self.settings)
+
+        for potentialfile in potentialfiles:
+            showdata = tvdata.RetrieveEpisodeData(potentialfile)
+            if showdata:
+                showstoprocess.append(showdata)
                 i = i + 1
-                if i == int(numberofFiles):
-                    return showsToProcess
-        
-        return showsToProcess #will reach here if there were less than numberofFiles found
-    
+                if i == int(numberoffiles):
+                    return showstoprocess
+
+        #will reach here if there were less than numberofFiles found
+        return showstoprocess
+
+    @staticmethod
+    def checkfileexists(filename):
+        """
+        Check to see if a file currently exists
+        """
+
+        return os.path.exists(filename)
+
+    def __getinputfilestoencode(self):
+        """
+        Get the details of the files that are waiting to be encoded
+        """
+
+        filelist = []
+
+        for show in self.settings.GetShowNames():
+            for dirpath, dirnames, filenames in os.walk(
+                    self.settings.GetShowInputDirectory(show)):
+                for inputfile in filenames:
+                    if inputfile.endswith(".mpg"):
+                        data = EncodeData(show, os.path.join(
+                            dirpath, inputfile))
+                        filelist.append(data)
+
+        return filelist
+
+    def __getencodeoutputfile(self, inputfile, showname, readonly):
+        """
+        Get the full path of the output filename to save the encoded video to
+        """
+
+        infile = os.path.basename(inputfile)
+        outfilename = infile[:-3]+"mkv"
+        outpath = findseason(self.settings.GetShowOutputDirectory(
+            showname), outfilename, readonly)
+        return os.path.join(outpath, outfilename)
+
+    def __getrecordingfile(self, filename):
+        """
+        Get the name of the mythtv recording based on the filename. The
+        filename contains the name of the mythtv recording as the
+        final directory in it's path.
+        """
+
+        return os.path.join(self.settings.TVRecordingDirectory(),
+                            os.path.dirname(filename).split("/")[-1] + ".mpg")
+
+
+def findseason(path, filename, readonly):
+    """
+    Get the name of the season folder. eg. Season 01
+    """
+
+    season = "Season {0}".format(filename[1:3])
+    seasonpath = os.path.join(path, season)
+
+    if not readonly:
+        if not os.path.exists(seasonpath):
+            os.makedirs(seasonpath)
+
+    return seasonpath

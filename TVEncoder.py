@@ -11,9 +11,14 @@ from libfilemanager import FileManager
 from libsettings import Settings
 from libhandbrake import Encoder
 from libtvdatasource import TVData
+from collections import namedtuple
 
 
-def ShowHelp():
+def showhelp():
+    """
+    Prints the command lines switches that are valid for the program.
+    """
+
     print 'TVEncoder.py -p -n <number of files to prepare for processing> ' \
           '- prepare n recordings'
     print 'TVEncoder.py -p -l -n <number of files to process> - lists the ' \
@@ -22,78 +27,95 @@ def ShowHelp():
     print 'TVEncoder.py -e -l - list the files that would be encoded'
 
 
-def PrintShowsToEncode(showsData):
-#    print "/n".join(showData)
-    for showData in showsData:
-        print showData.ToString()
+def print_shows_to_encode(shows):
+    """
+    Prints he details of the shows that have been selected for encoding.
+    """
+
+    for showdata in shows:
+        print showdata
 
 
-def PrintShowsToPrepare(showsData):
-    for showData in showsData:
-        showData.Print()
+def print_shows_to_prepare(shows):
+    """
+    Prints he details of the shows that have been selected for preparation.
+    """
+
+    for showdata in shows:
+        showdata.Print()
+
+
+def processarguments(options):
+    """
+    Determine the actions required from the input flags
+    """
+
+    inputoptions = namedtuple("inputoptions",
+                              "numfiles doencode readonly dolist")
+
+    for opt, arg in options:
+        if opt == '-h':
+            showhelp()
+            sys.exit()
+        elif opt == "-p":
+            inputoptions.doencode = False
+        elif opt == "-e":
+            inputoptions.doencode = True
+        elif opt == "-n":
+            inputoptions.numfiles = arg
+        elif opt == "-l":
+            inputoptions.readonly = True
+            inputoptions.dolist = True
+
+    return inputoptions
 
 
 def main(argv):
-    numFiles = 0
-    doEncode = False
-    readOnly = False
-    doList = False
+    """
+    The main program for TVEncoder.
+    """
 
     try:
         opts, args = getopt.getopt(argv, "hlpen:")
     except getopt.GetoptError:
-        ShowHelp()
+        showhelp()
         sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            ShowHelp()
-            sys.exit()
-        elif opt == "-p":
-            doEncode = False
-        elif opt == "-e":
-            doEncode = True
-        elif opt == "-n":
-            numFiles = arg
-        elif opt == "-l":
-            readOnly = True
-            doList = True
+
+    inputoptions = processarguments(opts)
 
     settings = Settings("settings.cfg")
+    filemanager = FileManager(settings)
 
-    if readOnly and doList:
-        if doEncode:
+    if inputoptions.readonly and inputoptions.dolist:
+        if inputoptions.doencode:
             #Generate the list of files that would be encoded
-            fileManager = FileManager(settings)
-            showData = fileManager.GetEncodingFiles(readOnly)
-            PrintShowsToEncode(showData)
+            showdata = filemanager.getencodingfiles(inputoptions.readonly)
+            print_shows_to_encode(showdata)
         else:
             # Generate the list of files to process
-            fileManager = FileManager(settings)
-            shows = fileManager.GetFilesToPrepare(numFiles)
+            shows = filemanager.getfilestoprepare(inputoptions.numfiles)
             print "num results: {0}".format(len(shows))
-            PrintShowsToPrepare(shows)
+            print_shows_to_prepare(shows)
     else:
-        if doEncode:
+        if inputoptions.doencode:
             #Encode the files and move them to their final destination
-            fileManager = FileManager(settings)
-            showData = fileManager.GetEncodingFiles(readOnly)
+            showdata = filemanager.getencodingfiles(inputoptions.readonly)
 
-            for show in showData:
-                if fileManager.CheckFileExists(show.outputFile):
+            for show in showdata:
+                if filemanager.checkfileexists(show.outputFile):
                     print "File {0} already exists. Cannot process." \
                         .format(show.outputFile)
                 else:
                     encoder = Encoder(settings.HandbrakeCommand())
                     result = encoder.Encode(show.inputFile, show.outputFile)
-
-                    fileManager.PerformPostEncodeFileOperations(
+                    # TODO do something with the result
+                    filemanager.performpostencodefileoperations(
                         show.inputFile, show.outputFile)
         else:
-            # TODO Process files for encoding
-            fileManager = FileManager(settings)
-            shows = fileManager.GetFilesToPrepare(numFiles)
-            tvData = TVData(settings)
-            tvData.PrepareEpisodes(shows)
+            # Process files for encoding
+            shows = filemanager.getfilestoprepare(inputoptions.numfiles)
+            tvdata = TVData(settings)
+            tvdata.PrepareEpisodes(shows)
 
 
 if __name__ == "__main__":
