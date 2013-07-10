@@ -33,7 +33,7 @@ def PrintShowsToPrepare(showsData):
 def main(argv):
     numFiles = 0
     doEncode = False
-    readOnly = True
+    readOnly = False
     doList = False
     
     try:
@@ -47,9 +47,7 @@ def main(argv):
           sys.exit()
        elif opt == "-p":
            doEncode = False
-           readOnly = False
        elif opt == "-e":
-           readOnly = False
            doEncode = True
        elif opt == "-n":
           numFiles = arg
