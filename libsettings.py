@@ -7,111 +7,122 @@ Created on Fri Jul  5 20:14:15 2013
 
 from configobj import ConfigObj
 
-class ShowSettings:
-    def __init__(self, name, inputDirectory, outputDirectory):
-        self.name = name
-        self.inputDirectory = inputDirectory
-        self.outputDirectory = outputDirectory
+
+#==============================================================================
+# class ShowSettings:
+#     """
+#     Container for the settings for a show
+#     """
+#
+#     def __init__(self, name, inputdirectory, outputdirectory):
+#         self.name = name
+#         self.inputdirectory = inputdirectory
+#         self.outputdirectory = outputdirectory
+#==============================================================================
 
 
 class Settings:
-    def __init__(self, settingsFile):
-        self.__config = ConfigObj(settingsFile)
-    
-    def TVRecordingDirectory(self):
+    """
+    Accessor for the configuration file
+    """
+
+    def __init__(self, settingsfile):
+        self.__config = ConfigObj(settingsfile)
+
+    def tvrecordingdirectory(self):
         return self.__config["TVRecordings"]
 
-    def HandbrakeCommand(self):
+    def handbrakecommand(self):
         return self.__config["HandbrakeCommand"]
-        
-    def MythTVAddress(self):
-        return self.__config["MythTV"]["address"]
-    
-    def MythTVUser(self):
-        return self.__config["MythTV"]["user"]        
 
-    def MythTVPassword(self):
+    def mythtvaddress(self):
+        return self.__config["MythTV"]["address"]
+
+    def mythtvuser(self):
+        return self.__config["MythTV"]["user"]
+
+    def mythtvpassword(self):
         return self.__config["MythTV"]["password"]
 
-    def MythTVDatabase(self):
+    def mythtvdatabase(self):
         return self.__config["MythTV"]["database"]
-        
-    def SickbeardAddress(self):
+
+    def sickbeardaddress(self):
         return self.__config["Sickbeard"]["address"]
-        
-    def SickbeardPort(self):
+
+    def sickbeardport(self):
         return int(self.__config["Sickbeard"]["port"])
 
-    def SickbeardAPIKey(self):
+    def sickbeardapikey(self):
         return self.__config["Sickbeard"]["APIKey"]
-    
-    def UnknownDirectory(self):
+
+    def unknowndirectory(self):
         return self.__config["Shows"]["UnknownInput"]
-    
-    def GetShowNames(self, includeAlias=False):
+
+    def getshownames(self, includealias=False):
         shows = self.__config["Shows"].sections
         result = shows[:]
-        if includeAlias:
+        if includealias:
             for show in shows:
                 for alias in self.__config["Shows"][show]["alias"]:
                     result.append(alias)
         return result
-    
-    def GetShowInputDirectory(self, showName):
-        show = self.__GetShowSubsection(showName)
+
+    def getshowinputdirectory(self, showname):
+        show = self.__getshowsubsection(showname)
         if show is None:
             return ""
         else:
             return show["InputDirectory"]
 
-    def GetShowUnknownDirectory(self, showName):
-        show = self.__GetShowSubsection(showName)
+    def getshowunknowndirectory(self, showname):
+        show = self.__getshowsubsection(showname)
         if show is None:
             return ""
         else:
             return show["UnknownDirectory"]
-    
-    def GetShowOutputDirectory(self, showName):
-        show = self.__GetShowSubsection(showName)
+
+    def getshowoutputdirectory(self, showname):
+        show = self.__getshowsubsection(showname)
         if show is None:
             return ""
         else:
             return show["OutputDirectory"]
-    
-    def GetShowAlias(self, showName):
-        show = self.__GetShowSubsection(showName)
+
+    def getshowalias(self, showname):
+        show = self.__getshowsubsection(showname)
         if show is None:
             return ""
         else:
             return show["alias"]
-    
-    def GetShowMythTVEpisodePrefix(self, showName):
-        show = self.__GetShowSubsection(showName)
+
+    def getshowmythtvepisodeprefix(self, showname):
+        show = self.__getshowsubsection(showname)
         if show is None:
             return ""
         else:
             return show["MythTvEpisodePrefix"]
 
-    def GetShowSickbeardEpisodePrefix(self, showName):
-        show = self.__GetShowSubsection(showName)
+    def getshowsickbearsepisodeprefix(self, showname):
+        show = self.__getshowsubsection(showname)
         if show is None:
             return ""
         else:
             return show["SickbeardPrefix"]
-            
-    def GetShow(self, showName):
-        showSection = self.__GetShowSubsection(showName)
-        if showSection is None:
+
+    def getshow(self, showname):
+        showsection = self.__getshowsubsection(showname)
+        if showsection is None:
             return None
         else:
-            return showSection.name
-    
-    def __GetShowSubsection(self, showName):
-        if showName in self.GetShowNames():
-            return self.__config["Shows"][showName]
-        else: # check liases
-            for show in self.GetShowNames():
-                if showName in self.__config["Shows"][show]["alias"]:
+            return showsection.name
+
+    def __getshowsubsection(self, showname):
+        if showname in self.getshownames():
+            return self.__config["Shows"][showname]
+        else:  # check liases
+            for show in self.getshownames():
+                if showname in self.__config["Shows"][show]["alias"]:
                     return self.__config["Shows"][show]
-        
+
         return None

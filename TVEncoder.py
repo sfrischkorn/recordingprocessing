@@ -9,7 +9,7 @@ import sys
 import getopt
 from libfilemanager import FileManager
 from libsettings import Settings
-from libhandbrake import Encoder
+import libhandbrake
 from libtvdatasource import TVData
 from collections import namedtuple
 
@@ -106,8 +106,9 @@ def main(argv):
                     print "File {0} already exists. Cannot process." \
                         .format(show.outputFile)
                 else:
-                    encoder = Encoder(settings.HandbrakeCommand())
-                    result = encoder.Encode(show.inputFile, show.outputFile)
+                    result = libhandbrake.encode(settings.handbrakecommand(),
+                                                 show.inputFile,
+                                                 show.outputFile)
                     # TODO do something with the result
                     filemanager.performpostencodefileoperations(
                         show.inputFile, show.outputFile)
