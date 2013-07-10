@@ -66,7 +66,7 @@ class FileManager:
         return os.path.isfile(file)
         
     def __GetRecordingFile(self, fileName):
-        return os.path.join(self.settings.TVRecordingDirectory, os.path.dirname(fileName).split("/")[-1] + ".mpg")
+        return os.path.join(self.settings.TVRecordingDirectory(), os.path.dirname(fileName).split("/")[-1] + ".mpg")
         
     def PerformPostEncodeFileOperations(self, inputFileName, outputFileName):
         shutil.rmtree(os.path.dirname(inputFileName))
