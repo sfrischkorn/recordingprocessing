@@ -83,7 +83,7 @@ def main(argv):
                 if fileManager.CheckFileExists(show.outputFile):
                     print "File {0} already exists. Cannot process.".format(show.outputFile)
                 else:
-                    encoder = Encoder(settings.HandbrakeCommand)
+                    encoder = Encoder(settings.HandbrakeCommand())
                     result = encoder.Encode(show.inputFile, show.outputFile)
                     
                     fileManager.PerformPostEncodeFileOperations(show.inputFile, show.outputFile)
