@@ -27,7 +27,9 @@ class Encoder:
         self.handbrakeCommand[3] = input
         self.handbrakeCommand[5] = output
 
-        logger.debug("Handbrake command is: {0}".format(self.handbrakeCommand))
+        if logger:        
+            logger.debug("Handbrake command is: {0}".format(self.handbrakeCommand))
+
         process = subprocess.Popen(self.handbrakeCommand)
         
         if waitForCompletion:
