@@ -12,29 +12,29 @@ from operator import itemgetter
 
 
 class Sickbeard:
+    """
+    Contains operations used to interact with sickbeard
+    """
+
     def __init__(self, settings):
         self.__settings = settings
-        self.__address = settings.SickbeardAddress()
-        self.__port = settings.SickbeardPort()
-        self.__apikey = settings.SickbeardAPIKey()
+        self.__address = settings.sickbeardaddress()
+        self.__port = settings.sickbeardport()
+        self.__apikey = settings.sickbeardapikey()
 
-    def __GetApiURL(self):
-        return "http://{0}:{1}/api/{2}/".format(self.__address, self.__port,
-                                                self.__apikey)
+    def findshowid(self, showname):
+        """
+        Get the tvdb show id for the show
+        """
 
-    def FindShowId(self, showName):
-        jsonurl = urlopen(self.__GetApiURL()+"?cmd=shows")
+        jsonurl = urlopen(self.__getapiurl()+"?cmd=shows")
         result = json.loads(jsonurl.read())
 
-        # TODO find a better way to do this
-        if showName == "Thomas and Friends":
-            showName = "Thomas The Tank Engine & Friends"
-        elif showName == "The Octonauts":
-            showName = "Octonauts"
+        showname = self.__settings.findshownameforalias(showname)
 
         shows = []
         for show in result['data']:
-            shows.append((show, fuzz.partial_ratio(showName.lower(),
+            shows.append((show, fuzz.partial_ratio(showname.lower(),
                                                    result['data'][show]
                                                    ['show_name'].lower())))
 
@@ -43,32 +43,30 @@ class Sickbeard:
         if shows[0][1] > 85:
             return shows[0][0]
 
-    def FindEpisodeByDescription(self, showId, season, episode, description):
-        jsonepisodeurl = urlopen("{0}?cmd=episode&tvdbid={1}&season={2}"
-                                 "&episode={3}".format(self.__GetApiURL(),
-                                 showId, season, episode))
-        episoderesult = json.loads(jsonepisodeurl.read())
+    def findepisodename(self, showid, season, episode):
+        """
+        Get the name of an episode, given it's season and episode numbers
+        """
 
-        sickbearddescription = episoderesult['data']['description']
-
-        if fuzzystringcompare(sickbearddescription, description):
-            return (season, episode, episoderesult['data']['name'])
-
-        return None
-
-    def FindEpisodeName(self, showId, season, episode):
         jsonurl = urlopen("{0}?cmd=episode&tvdbid={1}&season={2}"
-                          "&episode={3}".format(self.__GetApiURL(), showId,
-                          int(season), int(episode)))
+                          "&episode={3}".format(self.__getapiurl(), showid,
+                                                int(season), int(episode)))
+
         result = json.loads(jsonurl.read())
+
         if result['result'] == 'error':
             return ""
         else:
             return result['data']['name']
 
-    def FindEpisode(self, showId, name=None, description=None):
+    def findepisode(self, showid, name=None, description=None):
+        """
+        Find an episode, either by it's name or it's description. This is used
+        when the season and episode numbers are not known
+        """
+
         jsonurl = urlopen("{0}?cmd=show.seasons&tvdbid={1}".format(
-                          self.__GetApiURL(), showId))
+                          self.__getapiurl(), showid))
         result = json.loads(jsonurl.read())
 
         for season in result['data']:
@@ -78,11 +76,11 @@ class Sickbeard:
                                                            episodename) > 90:
                     return (season, episode, episodename)
                 elif description is not None:
-                    descriptionQueryResult = \
-                        self.FindEpisodeByDescription(showId, season,
-                                                      episode, description)
-                    if descriptionQueryResult is not None:
-                        return descriptionQueryResult
+                    descriptionqueryresult = \
+                        self.__findepisodebydescription(showid, season,
+                                                        episode, description)
+                    if descriptionqueryresult is not None:
+                        return descriptionqueryresult
 
         return (0, 0, '')
 
@@ -94,16 +92,48 @@ class Sickbeard:
 #             return subtitle
 #==============================================================================
 
-    def FixEpisodeTitle(self, showName, episodeTitle):
-        sickbeardPrefix = \
-            self.__settings.GetShowSickbeardEpisodePrefix(showName)
+    def fixepisodetitle(self, showname, episodetitle):
+        """
+        Check to see if there is a prefix specified for the show. If there is,
+        add the prefix to the start of the episode title
+        """
 
-        if sickbeardPrefix != "":
-            if not episodeTitle.lower.startswith(sickbeardPrefix.lower()):
-                return "{0} {1}".format(sickbeardPrefix.rstrip(),
-                                        episodeTitle.lstrip())
+        sickbeardprefix = \
+            self.__settings.GetShowSickbeardEpisodePrefix(showname)
 
-        return episodeTitle
+        if sickbeardprefix != "":
+            if not episodetitle.lower.startswith(sickbeardprefix.lower()):
+                return "{0} {1}".format(sickbeardprefix.rstrip(),
+                                        episodetitle.lstrip())
+
+        return episodetitle
+
+    def __getapiurl(self):
+        """
+        Get the url of the sickbeard api, substituting the values from the
+        settings
+        """
+
+        return "http://{0}:{1}/api/{2}/".format(self.__address, self.__port,
+                                                self.__apikey)
+
+    def __findepisodebydescription(self, showid, season, episode, description):
+        """
+        Find the details of an episode by searching for it's description
+        """
+
+        jsonepisodeurl = urlopen("{0}?cmd=episode&tvdbid={1}&season={2}"
+                                 "&episode={3}".format(self.__getapiurl(),
+                                                       showid, season,
+                                                       episode))
+        episoderesult = json.loads(jsonepisodeurl.read())
+
+        sickbearddescription = episoderesult['data']['description']
+
+        if fuzzystringcompare(sickbearddescription, description):
+            return (season, episode, episoderesult['data']['name'])
+
+        return None
 
 
 def fuzzystringcompare(string1, string2, matchvalue=85, casesensitive=False):

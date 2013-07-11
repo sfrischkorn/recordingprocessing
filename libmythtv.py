@@ -15,16 +15,16 @@ class MythTV:
     """
 
     def __init__(self, settings):
-        self.settings = settings
+        self.__settings = settings
 
     def retrieveepisodedata(self, inputfile):
         """
         Retrieve the data that mythtv knows about the recorded file.
         """
-        con = mdb.connect(self.settings.MythTVAddress(),
-                          self.settings.MythTVUser(),
-                          self.settings.MythTVPassword(),
-                          self.settings.MythTVDatabase())
+        con = mdb.connect(self.__settings.mythtvaddress(),
+                          self.__settings.mythtvuser(),
+                          self.__settings.mythtvpassword(),
+                          self.__settings.mythtvdatabase())
 
         with con:
             cur = con.cursor(mdb.cursors.DictCursor)
@@ -45,7 +45,7 @@ class MythTV:
         prefixes are listed in the configuration file.
         """
 
-        for prefix in self.settings.GetShowMythTVEpisodePrefix(showname):
+        for prefix in self.__settings.getshowmythtvepisodeprefix(showname):
             if episodetitle.lower().startswith(prefix.lower()):
                 return episodetitle[len(prefix):]
 

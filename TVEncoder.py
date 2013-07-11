@@ -27,22 +27,13 @@ def showhelp():
     print 'TVEncoder.py -e -l - list the files that would be encoded'
 
 
-def print_shows_to_encode(shows):
+def print_shows(shows):
     """
-    Prints he details of the shows that have been selected for encoding.
+    Prints he details of the shows.
     """
 
     for showdata in shows:
         print showdata
-
-
-def print_shows_to_prepare(shows):
-    """
-    Prints he details of the shows that have been selected for preparation.
-    """
-
-    for showdata in shows:
-        showdata.Print()
 
 
 def processarguments(options):
@@ -90,12 +81,12 @@ def main(argv):
         if inputoptions.doencode:
             #Generate the list of files that would be encoded
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
-            print_shows_to_encode(showdata)
+            print_shows(showdata)
         else:
             # Generate the list of files to process
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
             print "num results: {0}".format(len(shows))
-            print_shows_to_prepare(shows)
+            print_shows(shows)
     else:
         if inputoptions.doencode:
             #Encode the files and move them to their final destination
@@ -116,7 +107,7 @@ def main(argv):
             # Process files for encoding
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
             tvdata = TVData(settings)
-            tvdata.PrepareEpisodes(shows)
+            tvdata.prepareepisodes(shows)
 
 
 if __name__ == "__main__":

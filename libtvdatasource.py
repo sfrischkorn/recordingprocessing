@@ -10,131 +10,131 @@ from libsickbeard import Sickbeard
 import os
 import shutil
 
-# TODO Move these to settings
-#PROCESSDIR="/srv/storage2/files/VideoProcessing/"
-#THOMAS="Thomas"
-#CHUGGINGTON="Chuggington"
-#MIKE="MikeTheKnight"
-#OCTONAUTS="Octonauts"
-#NIGHTGARDEN="InTheNightGarden"
-#RAARAA="RaaRaa"
-#INPUTDIR="Input"
+
+def fixepisodeseasonnumber(number):
+    """
+    If the number is single digit, return a string with 0 in front of it.
+    """
+
+    if len(number) == 1:
+        return "0{0}".format(number)
+    else:
+        return number
+
 
 class TVData:
+    """
+    Class contains logic for processing information about tv episodes
+    """
+
     def __init__(self, settings):
-        self.settings = settings
-        
-    def FixEpisodeSeasonNumber(self, number):
-        if len(number) == 1:
-            return "0{0}".format(number)
-        else:
-            return number
-    
-    def GetDirectory(self, title, seasonFolder, season, episode):        
-        show = self.settings.GetShow(title)
+        self.__settings = settings
+
+    def getdirectory(self, title, seasonfolder, season, episode):
+        """
+        Get the directory where prepared episodes will be located.
+        """
+
+        show = self.__settings.getshow(title)
         if not show or show == "":
             print "Couldn't find show for {0}".format(title)
-            return self.settings.UnknownDirectory()
+            return self.__settings.unknowndirectory()
         elif season == "S00" or episode == "E00":
-            return self.settings.GetShowUnknownDirectory(show)
+            return self.__settings.getshowunknowndirectory(show)
         else:
-            return os.path.join(self.settings.GetShowInputDirectory(show), seasonFolder)
-#==============================================================================
-#         if title == "Thomas and Friends" or title == "Thomas the Tank Engine & Friends":
-#             directory = THOMAS
-#         elif title == "Chuggington":
-#             directory = CHUGGINGTON
-#         elif title == "Mike the Knight":
-#             directory = MIKE
-#         elif title == "Octonauts" or title == "The Octonauts":
-#             directory = OCTONAUTS
-#         elif title == "In the Night Garden":
-#             directory = NIGHTGARDEN
-#         elif title == "Raa Raa! The Noisy Lion":
-#             directory = RAARAA
-#         else:
-#             print "Didn't match"
-#==============================================================================
-        
-#        return os.path.join(PROCESSDIR, directory, INPUTDIR, season)
-            
-    def RetrieveEpisodeData(self, inputFile):
-        file = os.path.basename(inputFile)
-        
-        mythTv = MythTV(self.settings)
-        show = mythTv.RetrieveEpisodeData(file)
-        
-        showsToProcess = self.settings.GetShowNames(True)
-        
-        if show.title and show.title in showsToProcess:
-            show.title = self.settings.GetShow(show.title)
-    
+            return os.path.join(self.__settings.getshowinputdirectory(show),
+                                seasonfolder)
+
+    def retrieveepisodedata(self, inputfile):
+        """
+        Retrieve the details of an episode. It first looks up the details that
+        mythtv recorded about it, then looks up sickbeard to attempt to find
+        any missing details. Finally it determined the output file for it.
+        """
+
+        inputfilename = os.path.basename(inputfile)
+
+        mythtv = MythTV(self.__settings)
+        show = mythtv.retrieveepisodedata(inputfilename)
+
+        showstoprocess = self.__settings.getshownames(True)
+
+        if show.title and show.title in showstoprocess:
+            show.title = self.__settings.getshow(show.title)
+
             if (show.season == "0" or show.episode == "0"):
-                sickbeard = Sickbeard(self.settings)
-                showId = sickbeard.FindShowId(show.title)
-                
+                sickbeard = Sickbeard(self.__settings)
+                showid = sickbeard.findshowid(show.title)
+
                 if show.subtitle is not None and show.subtitle:
-                    show.subtitle = mythTv.FixMythTVEpisodeName(show.title, show.subtitle)
-                    show.subtitle = sickbeard.FixEpisodeTitle(show.title, show.subtitle)
-                    
-                result = sickbeard.FindEpisode(showId, show.subtitle, show.description)
+                    show.subtitle = mythtv.fixmythtvepisodename(show.title,
+                                                                show.subtitle)
+                    show.subtitle = sickbeard.fixepisodetitle(show.title,
+                                                              show.subtitle)
+
+                result = sickbeard.findepisode(showid, show.subtitle,
+                                               show.description)
                 show.season = str(result[0])
                 show.episode = str(result[1])
                 show.subtitle = result[2]
-            
+
             if show.subtitle is None or show.subtitle == "":
-                show.subtitle = sickbeard.FindEpisodeName(showId, show.season, show.episode)
-                
-            #if show.season != "0" and show.episode != "0":
-            show.season = self.FixEpisodeSeasonNumber(show.season)
-            show.episode = self.FixEpisodeSeasonNumber(show.episode)
-            
-            seasonFolder = "Season {0}".format(show.season)
+                show.subtitle = sickbeard.findepisodename(showid, show.season,
+                                                          show.episode)
+
+            show.season = fixepisodeseasonnumber(show.season)
+            show.episode = fixepisodeseasonnumber(show.episode)
+
+            seasonfolder = "Season {0}".format(show.season)
             season = "S{0}".format(show.season)
             episode = "E{0}".format(show.episode)
-            renamedFile = "{0}{1} - {2} - SD TV_.mpg".format(season, episode, show.subtitle)
-                
-            directory = self.GetDirectory(show.title, seasonFolder, season, episode)
-            
-            show.outputFile = os.path.join(directory, file[:-4], renamedFile)
-            show.inputFile = inputFile
-        
+            renamedfile = "{0}{1} - {2} - SD TV_.mpg".format(season, episode,
+                                                             show.subtitle)
+
+            directory = self.getdirectory(show.title, seasonfolder,
+                                          season, episode)
+
+            show.outputfile = os.path.join(directory, inputfilename[:-4],
+                                           renamedfile)
+            show.inputfile = inputfile
+
             return show
         else:
             return None
-    
+
 #==============================================================================
-#     def CheckTitleIsInList(serverAddress, user, password, database, inputFile):
-#         """Check that inputFile is a recording of a show that is to be processed."""
-#         file = os.path.basename(inputFile)
-#         show = MythTV.RetrieveEpisodeData('localhost', 'script', 'script', 'mythconverg', file)
-#         
-#         # TODO get this from settings
-#         if show.title in ["Thomas and Friends", "Thomas the Tank Engine & Friends", 
-#                           "Chuggington", "Mike the Knight", "Octonauts", 
-#                           "The Octonauts", "In the Night Garden", 
-#                           "Raa Raa! The Noisy Lion"]: 
-#                               return True
-#         else:
-#             return False
+#     def __determinetargetfilename(directory, filename, inputfilename):
+#         """
+#         Determine the filename for the input file. If the path does not
+#         exist, it is created.
+#         """
+#
+#         inputdir = os.path.join(directory, inputfilename[:-4])
+#
+#         if not os.path.exists(inputdir):
+#             os.makedirs(inputdir)
+#
+#         return os.path.join(inputdir, filename)
 #==============================================================================
-    
-    def DetermineTargetFilename(directory, filename, inputFilename):
-        dir = os.path.join(directory, inputFilename[:-4])
-    	
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-      
-        return os.path.join(dir, filename)
-        
-    
-    def ProcessEpisode(self, inputFile, outputFile):  
-        outputdir = os.path.dirname(outputFile)
+
+    @staticmethod
+    def processepisode(inputfile, outputfile):
+        """
+        Copy inputfile to outputfile, creating the path for outputfile if
+        required.
+        """
+
+        outputdir = os.path.dirname(outputfile)
         if not os.path.exists(outputdir):
             os.makedirs(outputdir)
-            
-        shutil.copyfile(inputFile, outputFile)
-    
-    def PrepareEpisodes(self, showsData):
-        for showData in showsData:
-            self.ProcessEpisode(showData.inputFile, showData.outputFile)
+
+        shutil.copyfile(inputfile, outputfile)
+
+    def prepareepisodes(self, showsdata):
+        """
+        Copy the files in showsdata from their input directory to their output
+        directory.
+        """
+
+        for showdata in showsdata:
+            self.processepisode(showdata.inputfile, showdata.outputfile)

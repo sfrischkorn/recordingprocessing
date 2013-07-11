@@ -35,7 +35,7 @@ class FileManager:
     """
 
     def __init__(self, settings):
-        self.settings = settings
+        self.__settings = settings
 
     def getencodingfiles(self, readonly=True):
         """
@@ -70,7 +70,7 @@ class FileManager:
         return the details of the number available.
         """
 
-        path = self.settings.TVRecordingDirectory()
+        path = self.__settings.tvrecordingdirectory()
         potentialfiles = glob.glob("{0}*.mpg".format(path))
         potentialfiles = sorted(potentialfiles, key=os.path.getctime)
         potentialfiles = [potentialfile for potentialfile in potentialfiles
@@ -82,10 +82,10 @@ class FileManager:
         i = 0
         print "Found {0} potential files".format(len(potentialfiles))
 
-        tvdata = TVData(self.settings)
+        tvdata = TVData(self.__settings)
 
         for potentialfile in potentialfiles:
-            showdata = tvdata.RetrieveEpisodeData(potentialfile)
+            showdata = tvdata.retrieveepisodedata(potentialfile)
             if showdata:
                 showstoprocess.append(showdata)
                 i = i + 1
@@ -110,9 +110,9 @@ class FileManager:
 
         filelist = []
 
-        for show in self.settings.GetShowNames():
+        for show in self.__settings.getshownames():
             for dirpath, dirnames, filenames in os.walk(
-                    self.settings.GetShowInputDirectory(show)):
+                    self.__settings.getshowinputdirectory(show)):
                 for inputfile in filenames:
                     if inputfile.endswith(".mpg"):
                         data = EncodeData(show, os.path.join(
@@ -128,7 +128,7 @@ class FileManager:
 
         infile = os.path.basename(inputfile)
         outfilename = infile[:-3]+"mkv"
-        outpath = findseason(self.settings.GetShowOutputDirectory(
+        outpath = findseason(self.__settings.GetShowOutputDirectory(
             showname), outfilename, readonly)
         return os.path.join(outpath, outfilename)
 
@@ -139,7 +139,7 @@ class FileManager:
         final directory in it's path.
         """
 
-        return os.path.join(self.settings.TVRecordingDirectory(),
+        return os.path.join(self.__settings.TVRecordingDirectory(),
                             os.path.dirname(filename).split("/")[-1] + ".mpg")
 
 
