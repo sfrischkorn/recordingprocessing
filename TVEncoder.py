@@ -38,8 +38,8 @@ def print_shows(shows, filemanager):
     for showdata in shows:
         if filemanager.checkfileexists(showdata.outputfile):
             existing.append(showdata)
-
-        print showdata
+        else:
+            print showdata
 
     if len(existing) > 0:
         print colored("The following shows have existing output files that "
