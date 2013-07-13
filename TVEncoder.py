@@ -106,16 +106,16 @@ def main(argv):
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
 
             for show in showdata:
-                if filemanager.checkfileexists(show.outputFile):
+                if filemanager.checkfileexists(show.outputfile):
                     print "File {0} already exists. Cannot process." \
-                        .format(show.outputFile)
+                        .format(show.outputfile)
                 else:
                     result = libhandbrake.encode(settings.handbrakecommand(),
-                                                 show.inputFile,
-                                                 show.outputFile)
+                                                 show.inputfile,
+                                                 show.outputfile)
                     # TODO do something with the result
                     filemanager.performpostencodefileoperations(
-                        show.inputFile, show.outputFile)
+                        show.inputfile, show.outputfile)
         else:
             # Process files for encoding
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
