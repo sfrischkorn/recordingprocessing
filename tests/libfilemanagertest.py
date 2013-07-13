@@ -6,9 +6,12 @@ Created on Fri Jul  5 14:12:26 2013
 """
 
 import unittest
+import os
+import sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
 from libfilemanager import EncodeData
+
 
 class libfilemanagertest(unittest.TestCase):
     def test_EncodeDataPrint(self):

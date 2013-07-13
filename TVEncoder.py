@@ -56,6 +56,8 @@ def processarguments(options):
     inputoptions = namedtuple("inputoptions",
                               "numfiles doencode readonly dolist")
 
+    inputoptions.readonly = False
+
     for opt, arg in options:
         if opt == '-h':
             showhelp()
@@ -68,7 +70,6 @@ def processarguments(options):
             inputoptions.numfiles = arg
         elif opt == "-l":
             inputoptions.readonly = True
-            inputoptions.dolist = True
 
     return inputoptions
 
@@ -77,19 +78,19 @@ def main(argv):
     """
     The main program for TVEncoder.
     """
-
+    print argv
     try:
         opts, args = getopt.getopt(argv, "hlpen:")
     except getopt.GetoptError:
         showhelp()
         sys.exit(2)
-
+    print opts
     inputoptions = processarguments(opts)
 
     settings = Settings("settings.cfg")
     filemanager = FileManager(settings)
 
-    if inputoptions.readonly and inputoptions.dolist:
+    if inputoptions.readonly:
         if inputoptions.doencode:
             #Generate the list of files that would be encoded
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
