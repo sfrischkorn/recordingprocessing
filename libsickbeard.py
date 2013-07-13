@@ -102,7 +102,7 @@ class Sickbeard:
             self.__settings.GetShowSickbeardEpisodePrefix(showname)
 
         if sickbeardprefix != "":
-            if not episodetitle.lower.startswith(sickbeardprefix.lower()):
+            if not episodetitle.lower().startswith(sickbeardprefix.lower()):
                 return "{0} {1}".format(sickbeardprefix.rstrip(),
                                         episodetitle.lstrip())
 
