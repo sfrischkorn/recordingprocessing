@@ -78,13 +78,11 @@ def main(argv):
     """
     The main program for TVEncoder.
     """
-    print argv
     try:
         opts, args = getopt.getopt(argv, "hlpen:")
     except getopt.GetoptError:
         showhelp()
         sys.exit(2)
-    print opts
     inputoptions = processarguments(opts)
 
     settings = Settings("settings.cfg")
