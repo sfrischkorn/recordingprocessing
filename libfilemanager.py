@@ -128,7 +128,7 @@ class FileManager:
 
         infile = os.path.basename(inputfile)
         outfilename = infile[:-3]+"mkv"
-        outpath = findseason(self.__settings.GetShowOutputDirectory(
+        outpath = findseason(self.__settings.getshowoutputdirectory(
             showname), outfilename, readonly)
         return os.path.join(outpath, outfilename)
 
