@@ -19,7 +19,7 @@ class EncodeData:
     show - The name of the show
     """
 
-    def __init__(self, inputfile='', show=None, outputfile=''):
+    def __init__(self, show=None, inputfile='', outputfile=''):
         self.inputfile = inputfile
         self.show = show
         self.outputfile = outputfile
