@@ -12,6 +12,7 @@ from libsettings import Settings
 import libhandbrake
 from libtvdatasource import TVData
 from collections import namedtuple
+from termcolor import colored
 
 
 def showhelp():
@@ -27,12 +28,16 @@ def showhelp():
     print 'TVEncoder.py -e -l - list the files that would be encoded'
 
 
-def print_shows(shows):
+def print_shows(shows, filemanager):
     """
     Prints he details of the shows.
     """
 
     for showdata in shows:
+        if filemanager.checkfileexists(showdata.outputfile):
+            print colored("File {0} already exists!".format(
+                showdata.outputfile), 'red')
+
         print showdata
 
 
@@ -81,12 +86,12 @@ def main(argv):
         if inputoptions.doencode:
             #Generate the list of files that would be encoded
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
-            print_shows(showdata)
+            print_shows(showdata, filemanager)
         else:
             # Generate the list of files to process
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
             print "num results: {0}".format(len(shows))
-            print_shows(shows)
+            print_shows(shows, filemanager)
     else:
         if inputoptions.doencode:
             #Encode the files and move them to their final destination
