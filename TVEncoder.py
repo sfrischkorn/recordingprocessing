@@ -33,13 +33,20 @@ def print_shows(shows, filemanager):
     Prints he details of the shows.
     """
 
+    existing = []
+
     for showdata in shows:
         if filemanager.checkfileexists(showdata.outputfile):
-            print colored("File {0} already exists!".format(
-                showdata.outputfile), 'red')
+            existing.append(showdata)
 
         print showdata
 
+    if len(existing) > 0:
+        print colored("The following shows have existing output files that "
+                      "need to be fixed before proceeding:\n")
+
+        for showdata in existing:
+            print colored(showdata)
 
 def processarguments(options):
     """
