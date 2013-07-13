@@ -43,10 +43,10 @@ def print_shows(shows, filemanager):
 
     if len(existing) > 0:
         print colored("The following shows have existing output files that "
-                      "need to be fixed before proceeding:\n")
+                      "need to be fixed before proceeding:\n", 'red')
 
         for showdata in existing:
-            print colored(showdata)
+            print colored(showdata, 'red')
 
 def processarguments(options):
     """
