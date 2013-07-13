@@ -139,7 +139,7 @@ class FileManager:
         final directory in it's path.
         """
 
-        return os.path.join(self.__settings.TVRecordingDirectory(),
+        return os.path.join(self.__settings.tvrecordingdirectory(),
                             os.path.dirname(filename).split("/")[-1] + ".mpg")
 
 
