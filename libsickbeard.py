@@ -99,7 +99,7 @@ class Sickbeard:
         """
 
         sickbeardprefix = \
-            self.__settings.GetShowSickbeardEpisodePrefix(showname)
+            self.__settings.getshowsickbeardepisodeprefix(showname)
 
         if sickbeardprefix != "":
             if not episodetitle.lower().startswith(sickbeardprefix.lower()):

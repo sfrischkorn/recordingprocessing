@@ -48,6 +48,7 @@ def print_shows(shows, filemanager):
         for showdata in existing:
             print colored(showdata, 'red')
 
+
 def processarguments(options):
     """
     Determine the actions required from the input flags
