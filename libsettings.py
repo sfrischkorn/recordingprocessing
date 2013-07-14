@@ -195,7 +195,7 @@ class Settings:
         else:
             return show["MythTvEpisodePrefix"]
 
-    def getshowsickbearsepisodeprefix(self, showname):
+    def getshowsickbeardepisodeprefix(self, showname):
         """
         Get the SickbeardPrefix setting for the show, showname.
         """
