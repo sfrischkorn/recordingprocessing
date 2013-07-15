@@ -28,25 +28,39 @@ def showhelp():
     print 'TVEncoder.py -e -l - list the files that would be encoded'
 
 
-def print_shows(shows, filemanager):
+def print_shows(shows):
     """
     Prints he details of the shows.
     """
+    okshows = []
+    noepisodes = []
+    existingfiles = []
 
-    existing = []
+    for show in shows:
+        showstr = str(show)
 
-    for showdata in shows:
-        if filemanager.checkfileexists(showdata.outputfile):
-            existing.append(showdata)
-        else:
-            print showdata
+        errors = show.checkproblems()
+        if not errors:
+            okshows.append(showstr)
+        elif "NO_EPISODE" in errors:
+            noepisodes.append(showstr)
+        elif "FILE_EXISTS" in errors:
+            existingfiles.append(showstr)
 
-    if len(existing) > 0:
-        print colored("The following shows have existing output files that "
-                      "need to be fixed before proceeding:\n", 'red')
+    for show in okshows:
+        print show
 
-        for showdata in existing:
-            print colored(showdata, 'red')
+    if noepisodes:
+        print colored("\nDetails of the episode could not be determined for "
+                      "the following shows:", 'red')
+        for show in noepisodes:
+            print colored(show, 'red')
+
+    if existingfiles:
+        print colored("\nThe following shows have a pre-existing "
+                      "output file:", 'red')
+        for show in existingfiles:
+            print colored(show, 'red')
 
 
 def processarguments(options):
@@ -93,12 +107,12 @@ def main(argv):
         if inputoptions.doencode:
             #Generate the list of files that would be encoded
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
-            print_shows(showdata, filemanager)
+            print_shows(showdata)
         else:
             # Generate the list of files to process
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
             print "num results: {0}".format(len(shows))
-            print_shows(shows, filemanager)
+            print_shows(shows)
     else:
         if inputoptions.doencode:
             #Encode the files and move them to their final destination

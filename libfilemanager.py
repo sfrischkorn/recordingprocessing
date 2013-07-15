@@ -28,6 +28,18 @@ class EncodeData:
         return "Show: {0}\nInput: {1}\nOutput: " \
                "{2}\n".format(self.show, self.inputfile, self.outputfile)
 
+    def checkproblems(self):
+        """
+        Check the EncodeData object for any potential problems.
+        """
+
+        errors = []
+
+        if os.path.exists(self.outputfile):
+            errors.append("FILE_EXISTS")
+
+        return errors
+
 
 class FileManager:
     """

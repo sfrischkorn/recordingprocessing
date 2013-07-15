@@ -19,7 +19,7 @@ class libfilemanagertest(unittest.TestCase):
         inputname = "test input"
         outputname = "test output"
         data = EncodeData(showname, inputname, outputname)
-        result = data.__str__()
+        result = str(data)
         expected = "Show: {0}\nInput: {1}\nOutput: " \
                "{2}\n".format(showname, inputname, outputname)
         self.assertEqual(result, expected)
