@@ -47,6 +47,12 @@ class Settings:
 
         return self.__config["HandbrakeCommand"]
 
+    def illegalcharacters(self):
+        """Get a list of illegal characters for filenames
+        """
+
+        return self.__config["IllegalCharacters"]
+
     def mythtvaddress(self):
         """
         Get the MythTV/address setting

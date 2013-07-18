@@ -88,8 +88,8 @@ class TVData:
             seasonfolder = "Season {0}".format(show.season)
             season = "S{0}".format(show.season)
             episode = "E{0}".format(show.episode)
-            renamedfile = "{0}{1} - {2} - SD TV_.mpg".format(season, episode,
-                                                             show.subtitle)
+            renamedfile = self.getoutputfilename(season, episode,
+                                                 show.subtitle)
 
             directory = self.getdirectory(show.title, seasonfolder,
                                           season, episode)
@@ -102,20 +102,17 @@ class TVData:
         else:
             return None
 
-#==============================================================================
-#     def __determinetargetfilename(directory, filename, inputfilename):
-#         """
-#         Determine the filename for the input file. If the path does not
-#         exist, it is created.
-#         """
-#
-#         inputdir = os.path.join(directory, inputfilename[:-4])
-#
-#         if not os.path.exists(inputdir):
-#             os.makedirs(inputdir)
-#
-#         return os.path.join(inputdir, filename)
-#==============================================================================
+    def getoutputfilename(self, season, episode, name):
+        """
+        Get the output filename, and remove any illegal characters
+        """
+
+        filename = "{0}{1} - {2} - SD TV_.mpg".format(season, episode, name)
+
+        for illegalcharacter in self.__settings.illegalcharacters():
+            filename = filename.replace(illegalcharacter, "")
+
+        return filename
 
     @staticmethod
     def processepisode(inputfile, outputfile):
