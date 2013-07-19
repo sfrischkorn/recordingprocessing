@@ -105,10 +105,10 @@ def main(argv):
     filemanager = FileManager(settings)
 
     logging.basicConfig(level=logging.DEBUG)
-    generallogger = createlogger("general", settings.generallogfile,
-                                 logging.debug)
-    actionlogger = createlogger("action", settings.actionlogfile,
-                                logging.info)
+    generallogger = createlogger("general", settings.generallogfile(),
+                                 logging.DEBUG)
+    actionlogger = createlogger("action", settings.actionlogfile(),
+                                logging.INFO)
 
     if inputoptions.readonly:
         if inputoptions.doencode:
