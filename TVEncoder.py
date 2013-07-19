@@ -13,6 +13,7 @@ import libhandbrake
 from libtvdatasource import TVData
 from collections import namedtuple
 from termcolor import colored
+import logging
 
 
 def showhelp():
@@ -103,6 +104,12 @@ def main(argv):
     settings = Settings("settings.cfg")
     filemanager = FileManager(settings)
 
+    logging.basicConfig(level=logging.DEBUG)
+    generallogger = createlogger("general", settings.generallogfile,
+                                 logging.debug)
+    actionlogger = createlogger("action", settings.actionlogfile,
+                                logging.info)
+
     if inputoptions.readonly:
         if inputoptions.doencode:
             #Generate the list of files that would be encoded
@@ -117,23 +124,51 @@ def main(argv):
         if inputoptions.doencode:
             #Encode the files and move them to their final destination
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
-
+            generallogger.info("There are {0} files to process."
+                               .format(len(showdata)))
             for show in showdata:
+                generallogger.info("========================================")
+                generallogger.info("Processing {0} of {1}, {2}".format(
+                    showdata.index(show) + 1, len(showdata), str(show)))
+
                 if filemanager.checkfileexists(show.outputfile):
-                    print "File {0} already exists. Cannot process." \
-                        .format(show.outputfile)
+                    message = "File {0} already exists. Cannot process." \
+                              .format(show.outputfile)
+                    generallogger.warning(message)
+                    actionlogger.warning(message)
                 else:
                     result = libhandbrake.encode(settings.handbrakecommand(),
                                                  show.inputfile,
                                                  show.outputfile)
-                    # TODO do something with the result
+
+                    generallogger.info("Encode finished with result: {0}"
+                                       .format(result))
                     filemanager.performpostencodefileoperations(
                         show.inputfile, show.outputfile)
+
+                    generallogger.info("Processing finished.")
+                    generallogger.info("==========================="
+                                       "=============\n\n")
         else:
             # Process files for encoding
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
+            print "Preparing {0} files".format(len(shows))
             tvdata = TVData(settings)
             tvdata.prepareepisodes(shows)
+
+
+def createlogger(name, filename, level):
+    """
+    Create a logger named <name> that will write to the file <filename>
+    """
+
+    logger = logging.getLogger(name)
+    handler = logging.FileHandler(filename)
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+    handler.setFormatter(formatter)
+    handler.setLevel(level)
+    logger.addHandler(handler)
+    return logger
 
 
 if __name__ == "__main__":

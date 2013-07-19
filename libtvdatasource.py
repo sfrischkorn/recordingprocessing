@@ -134,4 +134,11 @@ class TVData:
         """
 
         for showdata in showsdata:
+            print "========================================"
+            print "Copying {0} to {1}".format(showdata.inputfile,
+                                              showdata.outputfile)
+
             self.processepisode(showdata.inputfile, showdata.outputfile)
+
+            print "Finished copy"
+            print "========================================\n\n"

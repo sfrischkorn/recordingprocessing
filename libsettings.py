@@ -48,10 +48,25 @@ class Settings:
         return self.__config["HandbrakeCommand"]
 
     def illegalcharacters(self):
-        """Get a list of illegal characters for filenames
+        """
+        Get a list of illegal characters for filenames
         """
 
         return self.__config["IllegalCharacters"]
+
+    def generallogfile(self):
+        """
+        Get the filename to save general log messages to
+        """
+
+        return self.__config["Logging"]["General"]
+
+    def actionlogfile(self):
+        """
+        Get the filename to save the action log messages to
+        """
+
+        return self.__config["Logging"]["Action"]
 
     def mythtvaddress(self):
         """
