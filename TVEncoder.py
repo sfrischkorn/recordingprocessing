@@ -10,11 +10,14 @@ import getopt
 from libfilemanager import FileManager
 from libsettings import Settings
 import libhandbrake
+import libemail
 from libtvdatasource import TVData
 from collections import namedtuple
 from termcolor import colored
 import logging
 
+SETTINGS = "settings.cfg"
+EMAIL_SETTINGS = "EmailSettings.cfg"
 
 def showhelp():
     """
@@ -101,14 +104,8 @@ def main(argv):
         sys.exit(2)
     inputoptions = processarguments(opts)
 
-    settings = Settings("settings.cfg")
+    settings = Settings(SETTINGS)
     filemanager = FileManager(settings)
-
-    logging.basicConfig(level=logging.DEBUG)
-    generallogger = createlogger("general", settings.generallogfile(),
-                                 logging.DEBUG)
-    actionlogger = createlogger("action", settings.actionlogfile(),
-                                logging.INFO)
 
     if inputoptions.readonly:
         if inputoptions.doencode:
@@ -123,6 +120,13 @@ def main(argv):
     else:
         if inputoptions.doencode:
             #Encode the files and move them to their final destination
+
+            logging.basicConfig(level=logging.DEBUG)
+            generallogger = createlogger("general", settings.generallogfile(),
+                                         logging.DEBUG)
+            actionlogger = createlogger("action", settings.actionlogfile(),
+                                        logging.INFO)
+
             showdata = filemanager.getencodingfiles(inputoptions.readonly)
             generallogger.info("There are {0} files to process."
                                .format(len(showdata)))
@@ -149,6 +153,10 @@ def main(argv):
                     generallogger.info("Processing finished.")
                     generallogger.info("==========================="
                                        "=============\n\n")
+
+            libemail.SendEmail(EMAIL_SETTINGS, "Encoding Complete",
+                               "Finished encoding {0} shows."
+                               .format(len(showdata)))
         else:
             # Process files for encoding
             shows = filemanager.getfilestoprepare(inputoptions.numfiles)
@@ -163,7 +171,7 @@ def createlogger(name, filename, level):
     """
 
     logger = logging.getLogger(name)
-    handler = logging.FileHandler(filename)
+    handler = logging.FileHandler(filename, mode='w')
     formatter = logging.Formatter('%(asctime)s %(message)s')
     handler.setFormatter(formatter)
     handler.setLevel(level)

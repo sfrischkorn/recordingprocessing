@@ -231,7 +231,7 @@ class Settings:
     # just returns what is input
     def getshow(self, showname):
         """
-        Get the InputDirectory setting for the show, showname.
+        Get the name of the show, showname.
         """
         showsection = self.__getshowsubsection(showname)
         if showsection is None:
@@ -252,3 +252,51 @@ class Settings:
                     return self.__config["Shows"][show]
 
         return None
+
+
+class EmailSettings:
+    """
+    Accessor for the email configuration file
+    """
+
+    def __init__(self, settingsfile):
+        """
+        Initialise settingsfile as a configobj
+        """
+
+        self.__config = ConfigObj(settingsfile)
+
+    def getsmtpserver(self):
+        """
+        Get the address of the smtp server
+        """
+
+        return self.__config["SMTPServer"]
+
+    def getsmtpuser(self):
+        """
+        Get the username for the smtp server
+        """
+
+        return self.__config["SMTPUser"]
+
+    def getsmtppassword(self):
+        """
+        Get the username for the smtp server
+        """
+
+        return self.__config["SMTPPassword"]
+
+    def getfromaddress(self):
+        """
+        Get the from address for emails
+        """
+
+        return self.__config["From"]
+
+    def gettoaddress(self):
+        """
+        Get the to address for emails
+        """
+
+        return self.__config["To"]
