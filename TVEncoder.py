@@ -19,6 +19,7 @@ import logging
 SETTINGS = "settings.cfg"
 EMAIL_SETTINGS = "EmailSettings.cfg"
 
+
 def showhelp():
     """
     Prints the command lines switches that are valid for the program.
@@ -154,7 +155,7 @@ def main(argv):
                     generallogger.info("==========================="
                                        "=============\n\n")
 
-            libemail.SendEmail(EMAIL_SETTINGS, "Encoding Complete",
+            libemail.sendemail(EMAIL_SETTINGS, "Encoding Complete",
                                "Finished encoding {0} shows."
                                .format(len(showdata)))
         else:

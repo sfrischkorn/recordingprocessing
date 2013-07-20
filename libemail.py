@@ -11,7 +11,7 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-def SendEmail(settingsfilename, subject, body):
+def sendemail(settingsfilename, subject, body):
     settings = EmailSettings(settingsfilename)
 
     msg = MIMEText(body, "plain")
