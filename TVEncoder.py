@@ -151,6 +151,11 @@ def main(argv):
                     filemanager.performpostencodefileoperations(
                         show.inputfile, show.outputfile)
 
+                    if filemanager.checkduplicates(show.outputfile):
+                        actionlogger.info("There is an existing video file"
+                                          "present for {0}"
+                                          .format(show.outputfile))
+
                     generallogger.info("Processing finished.")
                     generallogger.info("==========================="
                                        "=============\n\n")
