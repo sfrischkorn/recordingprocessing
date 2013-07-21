@@ -12,6 +12,10 @@ from email.mime.text import MIMEText
 
 
 def sendemail(settingsfilename, subject, body):
+    """
+    Send an email using the settings defined in settingsfilename
+    """
+
     settings = EmailSettings(settingsfilename)
 
     msg = MIMEText(body, "plain")
@@ -19,10 +23,10 @@ def sendemail(settingsfilename, subject, body):
     msg["From"] = settings.getfromaddress()
     msg["To"] = settings.gettoaddress()
 
-    s = smtplib.SMTP(settings.getsmtpserver())
-    s.ehlo()
-    s.starttls()
-    s.login(settings.getsmtpuser(), settings.getsmtppassword())
-    s.sendmail(settings.getfromaddress(), [settings.gettoaddress()],
-               msg.as_string())
-    s.quit()
+    smtp = smtplib.SMTP(settings.getsmtpserver())
+    smtp.ehlo()
+    smtp.starttls()
+    smtp.login(settings.getsmtpuser(), settings.getsmtppassword())
+    smtp.sendmail(settings.getfromaddress(), [settings.gettoaddress()],
+                  msg.as_string())
+    smtp.quit()

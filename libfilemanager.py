@@ -112,7 +112,8 @@ class FileManager:
         #will reach here if there were less than numberofFiles found
         return showstoprocess
 
-    def checkduplicates(self, filename):
+    @staticmethod
+    def checkduplicates(filename):
         """
         Check to see if there are any other video files existing for the
         episode
@@ -121,7 +122,7 @@ class FileManager:
         dirname = os.path.dirname(filename)
         filename = os.path.basename(filename)[:6]
 
-        for dirpath, dirnames, filenames in os.walk(dirname):
+        for filenames in os.walk(dirname)[2]:
             for show in filenames:
                 extension = os.path.splitext(show)[1]
                 if (extension in [".avi", ".mpg", ".mpeg", "mp4"] and

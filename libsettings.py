@@ -227,8 +227,6 @@ class Settings:
         else:
             return show["SickbeardPrefix"]
 
-    # TODO check if this is actually doing anything. it seems like it
-    # just returns what is input
     def getshow(self, showname):
         """
         Get the name of the show, showname.
