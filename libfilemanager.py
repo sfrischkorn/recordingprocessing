@@ -38,6 +38,11 @@ class EncodeData:
         if os.path.exists(self.outputfile):
             errors.append("FILE_EXISTS")
 
+        if self.outputfile[-5:-4] == "_":
+            tempoutfile = self.outputfile[:-5] + self.outputfile[-4:]
+            if os.path.exists(tempoutfile):
+                errors.append("FILE_EXISTS")
+
         return errors
 
 
