@@ -40,6 +40,7 @@ class TVEncoderTest(unittest.TestCase):
         self.assertTrue(result.doencode)
         self.assertFalse(result.readonly)
 
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TVEncoderTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

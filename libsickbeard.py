@@ -67,13 +67,15 @@ class Sickbeard:
 
         jsonurl = urlopen("{0}?cmd=show.seasons&tvdbid={1}".format(
                           self.__getapiurl(), showid))
+        print jsonurl.__class__
+        print jsonurl.__class__.__name__
         result = json.loads(jsonurl.read())
 
         for season in result['data']:
             for episode in result['data'][season]:
                 episodename = result['data'][season][episode]['name']
-                if name is not None and fuzz.partial_ratio(name.lower(),
-                                                           episodename) > 90:
+                if name is not None and fuzz.ratio(name.lower(),
+                                                   episodename.lower()) > 85:
                     return (season, episode, episodename)
                 elif description is not None:
                     descriptionqueryresult = \
@@ -83,14 +85,6 @@ class Sickbeard:
                         return descriptionqueryresult
 
         return (0, 0, '')
-
-#==============================================================================
-#     def GetEpisodeName(subtitle, showName):
-#         if subtitle[:len(showName)].lower() == showName.lower():
-#             return subtitle[len(showName + ' and the '):]
-#         else:
-#             return subtitle
-#==============================================================================
 
     def fixepisodetitle(self, showname, episodetitle):
         """

@@ -12,17 +12,12 @@ import sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
 import libemail
-#from libsettings import EmailSettings
+from libsettings import EmailSettings
 import smtplib
 
 
 class libemailtest(unittest.TestCase):
     def test_SendEmail(self):
-        #EmailSettings = Mock('libsettings.EmailSettings')
-        #libsettings.EmailSettings.mock_returns = Mock('emailsettings')
-
-        #EmailSettings.getfromaddress.mock_returns = "from@email.com"
-        #libsettings.EmailSettings.gettoaddress.mock_returns = "to@gmail.com"
         mock("EmailSettings.getfromaddress", returns="from@email.com")
         mock("EmailSettings.gettoaddress", returns="to@email.com")
         mock("EmailSettings.getsmtpserver", returns="smtp.test")
