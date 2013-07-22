@@ -9,10 +9,10 @@ import unittest
 import os
 import sys
 import minimock
-from minimock import mock
+from minimock import mock, Mock
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parentdir)
-from libfilemanager import EncodeData
+from libfilemanager import EncodeData, FileManager
 
 
 class libfilemanagertest(unittest.TestCase):
@@ -45,6 +45,30 @@ class libfilemanagertest(unittest.TestCase):
         mock("os.path.exists", returns_iter=[False, True])
         result = data.checkproblems()
         self.assertIn("FILE_EXISTS", result)
+
+    def test_checkduplicateavi(self):
+        settings = Mock('libsettings.Settings')
+        filemanager = FileManager(settings)
+
+        os.walk = dummywalk
+
+        result = filemanager.checkduplicates("/path/to/S03E14 - Test - SD TV.mkv")
+
+        self.assertTrue(result)
+
+    def test_checkduplicatenomatch(self):
+        settings = Mock('libsettings.Settings')
+        filemanager = FileManager(settings)
+
+        os.walk = dummywalk
+
+        result = filemanager.checkduplicates("/path/to/S03E13 - Test - SD TV.mkv")
+
+        self.assertFalse(result)
+
+
+def dummywalk(arg):
+    return [("/path/to/", [], ["S03E14 - Test - SD TV.avi"])]
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(libfilemanagertest)

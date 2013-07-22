@@ -122,7 +122,7 @@ class FileManager:
         dirname = os.path.dirname(filename)
         filename = os.path.basename(filename)[:6]
 
-        for filenames in os.walk(dirname)[2]:
+        for _, _, filenames in os.walk(dirname):
             for show in filenames:
                 extension = os.path.splitext(show)[1]
                 if (extension in [".avi", ".mpg", ".mpeg", "mp4"] and
@@ -147,7 +147,7 @@ class FileManager:
         filelist = []
 
         for show in self.__settings.getshownames():
-            for dirpath, dirnames, filenames in os.walk(
+            for dirpath, _, filenames in os.walk(
                     self.__settings.getshowinputdirectory(show)):
                 for inputfile in filenames:
                     if inputfile.endswith(".mpg"):

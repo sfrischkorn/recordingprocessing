@@ -99,7 +99,7 @@ def main(argv):
     The main program for TVEncoder.
     """
     try:
-        opts, args = getopt.getopt(argv, "hlpen:")
+        opts, _ = getopt.getopt(argv, "hlpen:")
     except getopt.GetoptError:
         showhelp()
         sys.exit(2)

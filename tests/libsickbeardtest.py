@@ -19,7 +19,7 @@ class SickbeardTest(unittest.TestCase):
     def test_findepisodeCloseSubtitle(self):
         settings = Mock('libsettings.Settings')
         settings.sickbeardaddress.mock_returns = "test"
-        settings.sickbeardport.mock_returns = "test"
+        settings.sickbeardport.mock_returns = "123"
         settings.sickbeardapikey.mock_returns = "test"
 
         urllib.urlopen = dummy_urlopen
