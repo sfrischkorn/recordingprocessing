@@ -66,6 +66,16 @@ class libfilemanagertest(unittest.TestCase):
 
         self.assertFalse(result)
 
+    def test_checkduplicatesameextension(self):
+        settings = Mock('libsettings.Settings')
+        filemanager = FileManager(settings)
+
+        os.walk = dummywalk
+
+        result = filemanager.checkduplicates("/path/to/S03E14 - Test - SD TV.avi")
+
+        self.assertFalse(result)
+
 
 def dummywalk(arg):
     return [("/path/to/", [], ["S03E14 - Test - SD TV.avi"])]

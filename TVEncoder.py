@@ -31,6 +31,7 @@ def showhelp():
           'files that will be processed without actually encoding them'
     print 'TVEncoder.py -e - encode the files that have been processed'
     print 'TVEncoder.py -e -l - list the files that would be encoded'
+    print 'TVEncoder.py -c - check the output directories for duplicates'
 
 
 def print_shows(shows):
@@ -74,9 +75,11 @@ def processarguments(options):
     """
 
     inputoptions = namedtuple("inputoptions",
-                              "numfiles doencode readonly dolist")
+                              "numfiles doencode readonly dolist "
+                              "checkduplicates")
 
     inputoptions.readonly = False
+    inputoptions.checkduplicates = False
 
     for opt, arg in options:
         if opt == '-h':
@@ -90,6 +93,8 @@ def processarguments(options):
             inputoptions.numfiles = arg
         elif opt == "-l":
             inputoptions.readonly = True
+        elif opt == "-c":
+            inputoptions.checkduplicates = True
 
     return inputoptions
 
@@ -99,7 +104,7 @@ def main(argv):
     The main program for TVEncoder.
     """
     try:
-        opts, _ = getopt.getopt(argv, "hlpen:")
+        opts, _ = getopt.getopt(argv, "hlpecn:")
     except getopt.GetoptError:
         showhelp()
         sys.exit(2)
@@ -107,6 +112,16 @@ def main(argv):
 
     settings = Settings(SETTINGS)
     filemanager = FileManager(settings)
+
+    if inputoptions.checkduplicates:
+        print "Searching for duplicates..."
+        duplicates = filemanager.checkexistingduplicates()
+        if duplicates:
+            for duplicate in duplicates:
+                print duplicate
+        else:
+            print "No duplicates found."
+        return
 
     if inputoptions.readonly:
         if inputoptions.doencode:

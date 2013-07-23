@@ -112,6 +112,26 @@ class FileManager:
         #will reach here if there were less than numberofFiles found
         return showstoprocess
 
+    def checkexistingduplicates(self):
+        """
+        Check the existing files in the output directories for duplicate
+        files, typically in different formats
+        """
+
+        duplicates = []
+        for show in self.__settings.getshownames():
+            outputdir = self.__settings.getshowoutputdirectory(show)
+
+            for rootdir, dirnames, filenames in os.walk(outputdir):
+                for fle in filenames:
+                    filename = os.path.join(rootdir, fle)
+                    if os.path.splitext(fle)[1] in [".avi", ".mpg", ".mpeg",
+                                                    "mp4", ".mkv"]:
+                        if self.checkduplicates(filename):
+                            duplicates.append(filename)
+
+        return duplicates
+
     @staticmethod
     def checkduplicates(filename):
         """
@@ -120,13 +140,16 @@ class FileManager:
         """
 
         dirname = os.path.dirname(filename)
-        filename = os.path.basename(filename)[:6]
+        filename = os.path.basename(filename)
+        fileseasonepisode = filename[:6]
+        fileextension = os.path.splitext(filename)[1]
 
         for _, _, filenames in os.walk(dirname):
             for show in filenames:
                 extension = os.path.splitext(show)[1]
-                if (extension in [".avi", ".mpg", ".mpeg", "mp4"] and
-                        show[:6] == filename):
+                if (extension in [".avi", ".mpg", ".mpeg", "mp4", ".mkv"] and
+                        show[:6] == fileseasonepisode
+                        and fileextension != extension):
                     return True
 
         return False

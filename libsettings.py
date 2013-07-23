@@ -8,19 +8,6 @@ Created on Fri Jul  5 20:14:15 2013
 from configobj import ConfigObj
 
 
-#==============================================================================
-# class ShowSettings:
-#     """
-#     Container for the settings for a show
-#     """
-#
-#     def __init__(self, name, inputdirectory, outputdirectory):
-#         self.name = name
-#         self.inputdirectory = inputdirectory
-#         self.outputdirectory = outputdirectory
-#==============================================================================
-
-
 class Settings:
     """
     Accessor for the configuration file
