@@ -67,8 +67,7 @@ class Sickbeard:
 
         jsonurl = urlopen("{0}?cmd=show.seasons&tvdbid={1}".format(
                           self.__getapiurl(), showid))
-        print jsonurl.__class__
-        print jsonurl.__class__.__name__
+
         result = json.loads(jsonurl.read())
 
         for season in result['data']:
