@@ -36,6 +36,7 @@ class libfilemanagertest(unittest.TestCase):
         result = data.checkproblems()
 
         self.assertIn("FILE_EXISTS", result)
+        minimock.restore()
 
     def test_EncodeDataCheckProblemsFile_Exists(self):
         showname = "test show"
@@ -45,6 +46,18 @@ class libfilemanagertest(unittest.TestCase):
         mock("os.path.exists", returns_iter=[False, True])
         result = data.checkproblems()
         self.assertIn("FILE_EXISTS", result)
+        minimock.restore()
+
+    def test_checkfileexistscaseinsensitive(self):
+        settings = Mock('libsettings.Settings')
+        filemanager = FileManager(settings)
+
+        mock("os.listdir", returns=["filename.test"])
+
+        result = filemanager.checkfileexists("/path/to/fiLename.test", False)
+
+        self.assertTrue(result)
+        minimock.restore()
 
     def test_checkduplicateavi(self):
         settings = Mock('libsettings.Settings')
@@ -55,6 +68,7 @@ class libfilemanagertest(unittest.TestCase):
         result = filemanager.checkduplicates("/path/to/S03E14 - Test - SD TV.mkv")
 
         self.assertTrue(result)
+        minimock.restore()
 
     def test_checkduplicatenomatch(self):
         settings = Mock('libsettings.Settings')
@@ -65,6 +79,7 @@ class libfilemanagertest(unittest.TestCase):
         result = filemanager.checkduplicates("/path/to/S03E13 - Test - SD TV.mkv")
 
         self.assertFalse(result)
+        minimock.restore()
 
     def test_checkduplicatesameextension(self):
         settings = Mock('libsettings.Settings')
@@ -75,6 +90,8 @@ class libfilemanagertest(unittest.TestCase):
         result = filemanager.checkduplicates("/path/to/S03E14 - Test - SD TV.avi")
 
         self.assertFalse(result)
+        minimock.restore()
+
 
 
 def dummywalk(arg):

@@ -35,12 +35,12 @@ class EncodeData:
 
         errors = []
 
-        if os.path.exists(self.outputfile):
+        if checkfileexists(self.outputfile, False):
             errors.append("FILE_EXISTS")
 
         if self.outputfile[-5:-4] == "_":
             tempoutfile = self.outputfile[:-5] + self.outputfile[-4:]
-            if os.path.exists(tempoutfile):
+            if checkfileexists(tempoutfile, False):
                 errors.append("FILE_EXISTS")
 
         return errors
@@ -155,12 +155,19 @@ class FileManager:
         return False
 
     @staticmethod
-    def checkfileexists(filename):
+    def checkfileexists(filename, casesensitive=True):
         """
         Check to see if a file currently exists
         """
+        if casesensitive:
+            return os.path.exists(filename)
+        else:
+            filename = os.path.basename(filename)
+            for dirfile in os.listdir(os.path.dirname(filename)):
+                if (filename.lower() == dirfile.lower()):
+                    return True
 
-        return os.path.exists(filename)
+            return False
 
     def __getinputfilestoencode(self):
         """
@@ -215,3 +222,17 @@ def findseason(path, filename, readonly):
             os.makedirs(seasonpath)
 
     return seasonpath
+
+def checkfileexists(filename, casesensitive=True):
+    """
+    Check to see if a file currently exists
+    """
+    if casesensitive:
+        return os.path.exists(filename)
+    else:
+        filename = os.path.basename(filename)
+        for dirfile in os.listdir(os.path.dirname(filename)):
+            if (filename.lower() == dirfile.lower()):
+                return True
+
+        return False
