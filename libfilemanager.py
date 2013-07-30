@@ -223,6 +223,7 @@ def findseason(path, filename, readonly):
 
     return seasonpath
 
+
 def checkfileexists(filename, casesensitive=True):
     """
     Check to see if a file currently exists
@@ -230,9 +231,9 @@ def checkfileexists(filename, casesensitive=True):
     if casesensitive:
         return os.path.exists(filename)
     else:
-        filename = os.path.basename(filename)
+        basename = os.path.basename(filename)
         for dirfile in os.listdir(os.path.dirname(filename)):
-            if (filename.lower() == dirfile.lower()):
+            if (basename.lower() == dirfile.lower()):
                 return True
 
         return False
