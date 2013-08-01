@@ -228,11 +228,16 @@ def checkfileexists(filename, casesensitive=True):
     """
     Check to see if a file currently exists
     """
+    dirname = os.path.dirname(filename)
+
     if casesensitive:
         return os.path.exists(filename)
     else:
+        if not os.path.exists(dirname):
+            return False
+
         basename = os.path.basename(filename)
-        for dirfile in os.listdir(os.path.dirname(filename)):
+        for dirfile in os.listdir(dirname):
             if (basename.lower() == dirfile.lower()):
                 return True
 
