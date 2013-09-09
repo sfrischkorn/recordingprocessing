@@ -125,7 +125,7 @@ class FileManager:
             for rootdir, dirnames, filenames in os.walk(outputdir):
                 for fle in filenames:
                     filename = os.path.join(rootdir, fle)
-                    if os.path.splitext(fle)[1] in [".avi", ".mpg", ".mpeg",
+                    if os.path.splitext(fle)[1].lower() in [".avi", ".mpg", ".mpeg",
                                                     "mp4", ".mkv"]:
                         if self.checkduplicates(filename):
                             duplicates.append(filename)
@@ -147,7 +147,7 @@ class FileManager:
         for _, _, filenames in os.walk(dirname):
             for show in filenames:
                 extension = os.path.splitext(show)[1]
-                if (extension in [".avi", ".mpg", ".mpeg", "mp4", ".mkv"] and
+                if (extension.lower() in [".avi", ".mpg", ".mpeg", "mp4", ".mkv"] and
                         show[:6] == fileseasonepisode
                         and fileextension != extension):
                     return True

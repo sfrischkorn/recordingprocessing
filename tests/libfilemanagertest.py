@@ -70,6 +70,17 @@ class libfilemanagertest(unittest.TestCase):
         self.assertTrue(result)
         minimock.restore()
 
+    def test_checkduplicatethomas(self):
+        settings = Mock('libsettings.Settings')
+        filemanager = FileManager(settings)
+
+        os.walk = thomaswalk
+
+        result = filemanager.checkduplicates("/path/to/S12E05 - Henry Gets It Wrong - SD TV.mkv")
+
+        self.assertTrue(result)
+        minimock.restore()
+
     def test_checkduplicatenomatch(self):
         settings = Mock('libsettings.Settings')
         filemanager = FileManager(settings)
@@ -96,6 +107,9 @@ class libfilemanagertest(unittest.TestCase):
 
 def dummywalk(arg):
     return [("/path/to/", [], ["S03E14 - Test - SD TV.avi"])]
+
+def thomaswalk(arg):
+    return [(("/path/to/", [], ["S12E05 - Henry Gets It Wrong - Unknown.AVI"]))]
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(libfilemanagertest)
