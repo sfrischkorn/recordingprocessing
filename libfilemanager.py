@@ -130,7 +130,7 @@ class FileManager:
                         if self.checkduplicates(filename):
                             duplicates.append(filename)
 
-        return duplicates.sorted()
+        return sorted(duplicates)
 
     @staticmethod
     def checkduplicates(filename):
